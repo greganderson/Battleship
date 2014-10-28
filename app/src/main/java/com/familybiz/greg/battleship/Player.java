@@ -6,7 +6,7 @@ package com.familybiz.greg.battleship;
 public class Player {
 
 	public interface OnGridChangedListener {
-		public void onGridChanged(int i, int j);
+		public void onGridChanged(int x, int y);
 	}
 	OnGridChangedListener mOnGridChangedListener = null;
 	public void setOnGridChangedListener(OnGridChangedListener onGridChangedListener) {
@@ -26,22 +26,30 @@ public class Player {
 		int GRID_WIDTH = 10;
 		cells = new Cell[GRID_WIDTH][GRID_HEIGHT];
 
-		for (int i = 0; i < GRID_HEIGHT; i++) {
-			for (int j = 0; j < GRID_WIDTH; j++) {
+		for (int x = 0; x < GRID_HEIGHT; x++) {
+			for (int y = 0; y < GRID_WIDTH; y++) {
 				Cell c = new Cell();
 				c.cellType = WATER;
-				cells[i][j] = c;
+				cells[x][y] = c;
 			}
 		}
 	}
 
-	public boolean missileShot(int i, int j) {
-		if (cells[i][j].isShot)
+	public boolean missileShot(int x, int y) {
+		if (cells[x][y].isShot)
 			return false;
-		cells[i][j].isShot = true;
+		cells[x][y].isShot = true;
 		if (mOnGridChangedListener != null)
-			mOnGridChangedListener.onGridChanged(i, j);
+			mOnGridChangedListener.onGridChanged(x, y);
 		return true;
+	}
+
+	public boolean isCellAShip(int x, int y) {
+		return cells[x][y].cellType.equals(SHIP);
+	}
+
+	public boolean hasCellBeenShot(int x, int y) {
+		return cells[x][y].isShot;
 	}
 
 
