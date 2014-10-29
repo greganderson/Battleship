@@ -7,15 +7,28 @@ import java.util.Random;
  */
 public class Player {
 
-	public interface OnGridChangedListener {
-		public void onGridChanged(int x, int y, boolean isHit);
+	// Player's grid
+	public interface OnPlayerGridChangedListener {
+		public void onPlayerGridChanged(int x, int y, boolean isHit);
 	}
-	OnGridChangedListener mOnGridChangedListener = null;
-	public void setOnGridChangedListener(OnGridChangedListener onGridChangedListener) {
-		mOnGridChangedListener = onGridChangedListener;
+	OnPlayerGridChangedListener mOnPlayerGridChangedListener = null;
+	public void setOnPlayerGridChangedListener(OnPlayerGridChangedListener onPlayerGridChangedListener) {
+		mOnPlayerGridChangedListener = onPlayerGridChangedListener;
 	}
-	public OnGridChangedListener getOnGridChangedListener() {
-		return mOnGridChangedListener;
+	public OnPlayerGridChangedListener getPlayerOnGridChangedListener() {
+		return mOnPlayerGridChangedListener;
+	}
+
+	// Opponent's grid
+	public interface OnOpponentGridChangedListener {
+		public void onOpponentGridChanged(int x, int y, boolean isHit);
+	}
+	OnOpponentGridChangedListener mOnOpponentGridChangedListener = null;
+	public void setOnOpponentGridChangedListener(OnOpponentGridChangedListener onOpponentGridChangedListener) {
+		mOnOpponentGridChangedListener = onOpponentGridChangedListener;
+	}
+	public OnOpponentGridChangedListener getOnOpponentGridChangedListener() {
+		return mOnOpponentGridChangedListener;
 	}
 
 	private final String SHIP = "ship";
@@ -23,26 +36,33 @@ public class Player {
 	private final int GRID_HEIGHT = 10;
 	private final int GRID_WIDTH = 10;
 
-	private Cell[][] cells;
-
-	public boolean isShip(int i, int j) {
-		return cells[i][j].cellType.equals(SHIP);
-	}
+	private Cell[][] playerCells;
+	private Cell[][] opponentCells;
 
 	public Player() {
-		cells = new Cell[GRID_WIDTH][GRID_HEIGHT];
+		playerCells = new Cell[GRID_WIDTH][GRID_HEIGHT];
+		opponentCells = new Cell[GRID_WIDTH][GRID_HEIGHT];
 
+		// Initialize all cells to water
+		Cell c;
 		for (int x = 0; x < GRID_HEIGHT; x++) {
 			for (int y = 0; y < GRID_WIDTH; y++) {
-				Cell c = new Cell();
-				c.cellType = WATER;
-				cells[x][y] = c;
+				// Player's cells
+				c = new Cell();
+				playerCells[x][y] = c;
+
+				// Opponent's cells
+				c = new Cell();
+				opponentCells[x][y] = c;
 			}
 		}
 
 		initializeShips();
 	}
 
+	/**
+	 * Randomly place the ships.
+	 */
 	private void initializeShips() {
 		Random rand = new Random();
 
@@ -69,14 +89,14 @@ public class Player {
 					try {
 						// Pick the cell in the specified direction
 						if (tryRight)
-							currentCell = cells[randomX][randomY + i];
+							currentCell = playerCells[randomX][randomY + i];
 						else
-							currentCell = cells[randomX + i][randomY];
+							currentCell = playerCells[randomX + i][randomY];
 					}
 					catch (ArrayIndexOutOfBoundsException e) {
 						shipComplete = false;
 
-						// Reset the cells that got set during this attempt
+						// Reset the playerCells that got set during this attempt
 						resetShipCells(randomX, randomY, i, tryRight);
 
 						// Start over
@@ -87,7 +107,7 @@ public class Player {
 					if (currentCell.cellType.equals(SHIP)) {
 						shipComplete = false;
 
-						// Reset the cells that got set during this attempt
+						// Reset the playerCells that got set during this attempt
 						resetShipCells(randomX, randomY, i, tryRight);
 
 						// Start over
@@ -101,15 +121,18 @@ public class Player {
 		}
 	}
 
+	/**
+	 * Reset the playerCells that got set to be part of a ship back to water.
+	 */
 	private void resetShipCells(int x, int y, int i, boolean tryRight) {
 		Cell currentCell;
-		// Reset the cells that got set during this attempt
+		// Reset the playerCells that got set during this attempt
 		i--;
 		for (; i >= 0; i--) {
 			if (tryRight)
-				currentCell = cells[x][y + i];
+				currentCell = playerCells[x][y + i];
 			else
-				currentCell = cells[x + i][y];
+				currentCell = playerCells[x + i][y];
 			currentCell.cellType = WATER;
 		}
 	}
@@ -118,13 +141,26 @@ public class Player {
 	 * Returns true if the cell has NOT already been shot at, false otherwise.  Triggers the grid
 	 * changed listener.
 	 */
-	public boolean missileShot(int x, int y) {
-		if (cells[x][y].isShot)
+	public boolean opponentShotMissile(int x, int y) {
+		// Check if cell has already been shot at
+		if (playerCells[x][y].isShot)
 			return false;
-		cells[x][y].isShot = true;
-		if (mOnGridChangedListener != null)
-			mOnGridChangedListener.onGridChanged(x, y, cells[x][y].cellType.equals(SHIP));
+
+		playerCells[x][y].isShot = true;
+		if (mOnPlayerGridChangedListener != null)
+			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[x][y].cellType.equals(SHIP));
+
 		return true;
+	}
+
+	/**
+	 * Changes the opponent's grid according to the missile fired.
+	 */
+	public void playerShotMissile(int x, int y, boolean hit) {
+		opponentCells[x][y].isShot = true;
+		opponentCells[x][y].cellType = hit ? SHIP : WATER;
+		if (mOnOpponentGridChangedListener != null)
+			mOnOpponentGridChangedListener.onOpponentGridChanged(x, y, opponentCells[x][y].cellType.equals(SHIP));
 	}
 
 
@@ -133,7 +169,7 @@ public class Player {
 	 * a ship or cell is water) as well as whether the cell has been shot at.
 	 */
 	private class Cell {
-		public String cellType = "none";
-		public boolean isShot = false;
+		public String cellType = WATER;     // Either water or a ship
+		public boolean isShot = false;      // True if the cell has already been shot at
 	}
 }
