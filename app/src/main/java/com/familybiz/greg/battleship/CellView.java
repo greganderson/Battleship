@@ -11,6 +11,6 @@ public class CellView extends View {
 
 	public CellView(Context context) {
 		super(context);
-		setBackgroundColor(Color.BLUE);
+        setBackgroundColor(Color.DKGRAY);
 	}
 }
