@@ -39,12 +39,11 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 		String[][] shipCellsPlayer1 = player1.getShipCells();
 		String[][] shipCellsPlayer2 = player2.getShipCells();
-		String[][] blankCells = player1.getOpponentCells();
 
 		initializePlayerShipCells(mPlayer1PlayerGrid, shipCellsPlayer1);
-		initializePlayerShipCells(mPlayer1OpponentGrid, blankCells);
+		initializeOpenWaterCells(mPlayer1OpponentGrid);
 		initializePlayerShipCells(mPlayer2PlayerGrid, shipCellsPlayer2);
-		initializePlayerShipCells(mPlayer2OpponentGrid, blankCells);
+		initializeOpenWaterCells(mPlayer2OpponentGrid);
 
 		rootLayout.addView(mPlayer1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 		rootLayout.addView(mPlayer1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
@@ -60,6 +59,17 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 				// Set color of cell to gray if a ship, blue otherwise
 				c.setBackgroundColor(cells[y][x].equals(Player.SHIP) ? GridView.CELL_COLOR_SHIP : GridView.CELL_COLOR_WATER);
 
+				view.addView(c);
+			}
+		}
+	}
+
+	private void initializeOpenWaterCells(GridView view) {
+		for (int y = 0; y < 10; y++) {
+			for (int x = 0; x < 10; x++) {
+				CellView c = new CellView(getActivity(), x, y);
+				c.setBackgroundColor(GridView.CELL_COLOR_WATER);
+
 				c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
 					@Override
 					public void onCellTouched(int x, int y) {
@@ -68,6 +78,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 						//
 					}
 				});
+
 				view.addView(c);
 			}
 		}
