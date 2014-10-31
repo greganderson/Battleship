@@ -44,6 +44,9 @@ public class GridView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean b, int i, int i2, int i3, int i4) {
+	    int margin = 5;
+	    int bottomMargin, rightMargin;
+
         for (int childIndex = 0; childIndex < getChildCount(); childIndex++) {
             CellView child = (CellView) getChildAt(childIndex);
             mChildren.add(child);
@@ -61,7 +64,14 @@ public class GridView extends ViewGroup {
             childLayout.right = ((childIndex % 10) * actualWidth) + actualWidth;
             childLayout.bottom = ((childIndex / 10) * actualHeight) + actualHeight;
 
-			child.layout(childLayout.left + 5, childLayout.top + 5, childLayout.right - 5, childLayout.bottom - 5);
+	        bottomMargin = childIndex / 10 == 9 ? 0 : margin;
+	        rightMargin  = childIndex % 10 == 9 ? 0 : margin;
+
+			child.layout(
+					childLayout.left + margin,
+					childLayout.top + margin,
+					childLayout.right - rightMargin,
+					childLayout.bottom - bottomMargin);
         }
     }
 }

@@ -30,28 +30,20 @@ public class MainActivity extends Activity {
 			    ViewGroup.LayoutParams.MATCH_PARENT,
 			    20));
 
-	    FrameLayout playerGridView = new FrameLayout(this);
-	    playerGridView.setId(11);
-	    rootLayout.addView(playerGridView, new LinearLayout.LayoutParams(
+	    FrameLayout gameView = new FrameLayout(this);
+	    gameView.setId(11);
+	    gameView.setBackgroundColor(Color.BLACK);
+	    rootLayout.addView(gameView, new LinearLayout.LayoutParams(
 			    0,
 			    ViewGroup.LayoutParams.MATCH_PARENT,
-			    40));
-
-	    FrameLayout opponentGridView = new FrameLayout(this);
-	    opponentGridView.setId(12);
-	    rootLayout.addView(opponentGridView, new LinearLayout.LayoutParams(
-			    0,
-			    ViewGroup.LayoutParams.MATCH_PARENT,
-			    40));
+			    80));
 
 	    GameListFragment gameListFragment = new GameListFragment();
-	    GridFragment playerGridFragment = new GridFragment();
-	    GridFragment opponentGridFragment = new GridFragment();
+	    GridFragment gridFragment = new GridFragment();
 
 	    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
 	    addTransaction.add(10, gameListFragment);
-	    addTransaction.add(11, playerGridFragment);
-	    addTransaction.add(12, opponentGridFragment);
+	    addTransaction.add(11, gridFragment);
 	    addTransaction.commit();
     }
 }

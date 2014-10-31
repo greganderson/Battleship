@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 /**
@@ -15,12 +16,29 @@ public class GridFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		GridView gridView = new GridView(getActivity());
-		gridView.setBackgroundColor(Color.BLACK);
+		LinearLayout rootLayout = new LinearLayout(getActivity());
+		rootLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-		Player player = new Player();
-		String[][] cells = player.getCells();
+		GridView gridViewPlayer1 = new GridView(getActivity());
+		GridView gridViewPlayer2 = new GridView(getActivity());
+		gridViewPlayer1.setBackgroundColor(Color.BLACK);
+		gridViewPlayer2.setBackgroundColor(Color.BLACK);
 
+		Player player1 = new Player();
+		Player player2 = new Player();
+		String[][] cellsPlayer1 = player1.getCells();
+		String[][] cellsPlayer2 = player2.getCells();
+
+		initializePlayerCells(gridViewPlayer1, cellsPlayer1);
+		initializePlayerCells(gridViewPlayer2, cellsPlayer2);
+
+		rootLayout.addView(gridViewPlayer1, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		rootLayout.addView(gridViewPlayer2, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+
+		return rootLayout;
+	}
+
+	private void initializePlayerCells(GridView view, String[][] cells) {
 		for (int y = 0; y < 10; y++) {
 			for (int x = 0; x < 10; x++) {
 				CellView c = new CellView(getActivity(), x, y);
@@ -34,10 +52,8 @@ public class GridFragment extends Fragment {
 						Toast.makeText(getActivity(), "(" + x + ", " + y + ")", Toast.LENGTH_SHORT).show();
 					}
 				});
-				gridView.addView(c);
+				view.addView(c);
 			}
 		}
-
-		return gridView;
 	}
 }
