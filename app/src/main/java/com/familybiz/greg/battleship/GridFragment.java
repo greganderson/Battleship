@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 /**
  * Created by Greg Anderson
@@ -17,8 +18,18 @@ public class GridFragment extends Fragment {
 		GridView gridView = new GridView(getActivity());
 		gridView.setBackgroundColor(Color.BLACK);
 
-		for (int i = 0; i < 100; i++)
-			gridView.addView(new CellView(getActivity()));
+		for (int y = 0; y < 10; y++) {
+			for (int x = 0; x < 10; x++) {
+				CellView c = new CellView(getActivity(), x, y);
+				c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
+					@Override
+					public void onCellTouched(int x, int y) {
+						Toast.makeText(getActivity(), "(" + x + ", " + y + ")", Toast.LENGTH_SHORT).show();
+					}
+				});
+				gridView.addView(c);
+			}
+		}
 
 		return gridView;
 	}

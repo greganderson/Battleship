@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-
 public class GridView extends ViewGroup {
 
     public static ArrayList<View> mChildren = new ArrayList<View>();
