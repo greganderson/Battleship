@@ -7,32 +7,8 @@ import java.util.Random;
  */
 public class Player {
 
-	// Player's grid
-	public interface OnPlayerGridChangedListener {
-		public void onPlayerGridChanged(int x, int y, boolean isHit);
-	}
-	OnPlayerGridChangedListener mOnPlayerGridChangedListener = null;
-	public void setOnPlayerGridChangedListener(OnPlayerGridChangedListener onPlayerGridChangedListener) {
-		mOnPlayerGridChangedListener = onPlayerGridChangedListener;
-	}
-	public OnPlayerGridChangedListener getPlayerOnGridChangedListener() {
-		return mOnPlayerGridChangedListener;
-	}
-
-	// Opponent's grid
-	public interface OnOpponentGridChangedListener {
-		public void onOpponentGridChanged(int x, int y, boolean isHit);
-	}
-	OnOpponentGridChangedListener mOnOpponentGridChangedListener = null;
-	public void setOnOpponentGridChangedListener(OnOpponentGridChangedListener onOpponentGridChangedListener) {
-		mOnOpponentGridChangedListener = onOpponentGridChangedListener;
-	}
-	public OnOpponentGridChangedListener getOnOpponentGridChangedListener() {
-		return mOnOpponentGridChangedListener;
-	}
-
-	private final String SHIP = "ship";
-	private final String WATER = "water";
+	public final String SHIP = "ship";
+	public final String WATER = "water";
 	private final int GRID_HEIGHT = 10;
 	private final int GRID_WIDTH = 10;
 
@@ -45,19 +21,56 @@ public class Player {
 
 		// Initialize all cells to water
 		Cell c;
-		for (int x = 0; x < GRID_HEIGHT; x++) {
-			for (int y = 0; y < GRID_WIDTH; y++) {
+		for (int y = 0; y < GRID_HEIGHT; y++) {
+			for (int x = 0; x < GRID_WIDTH; x++) {
 				// Player's cells
 				c = new Cell();
-				playerCells[x][y] = c;
+				playerCells[y][x] = c;
 
 				// Opponent's cells
 				c = new Cell();
-				opponentCells[x][y] = c;
+				opponentCells[y][x] = c;
 			}
 		}
 
 		initializeShips();
+	}
+
+	/**
+	 * Returns a 2D array of strings containing the cell types.
+	 */
+	public String[][] getCells() {
+		String[][] cells = new String[GRID_WIDTH][GRID_HEIGHT];
+		for (int y = 0; y < playerCells.length; y++)
+			for (int x = 0; x < playerCells.length; x++)
+			cells[y][x] = playerCells[y][x].cellType;
+		return cells;
+	}
+
+	/**
+	 * Returns true if the cell has NOT already been shot at, false otherwise.  Triggers the grid
+	 * changed listener.
+	 */
+	public boolean opponentShotMissile(int x, int y) {
+		// Check if cell has already been shot at
+		if (playerCells[y][x].isShot)
+			return false;
+
+		playerCells[y][x].isShot = true;
+		if (mOnPlayerGridChangedListener != null)
+			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[y][x].cellType.equals(SHIP));
+
+		return true;
+	}
+
+	/**
+	 * Changes the opponent's grid according to the missile fired.
+	 */
+	public void playerShotMissile(int x, int y, boolean hit) {
+		opponentCells[y][x].isShot = true;
+		opponentCells[y][x].cellType = hit ? SHIP : WATER;
+		if (mOnOpponentGridChangedListener != null)
+			mOnOpponentGridChangedListener.onOpponentGridChanged(x, y, opponentCells[y][x].cellType.equals(SHIP));
 	}
 
 	/**
@@ -89,9 +102,9 @@ public class Player {
 					try {
 						// Pick the cell in the specified direction
 						if (tryRight)
-							currentCell = playerCells[randomX][randomY + i];
+							currentCell = playerCells[randomY][randomX + i];
 						else
-							currentCell = playerCells[randomX + i][randomY];
+							currentCell = playerCells[randomY + i][randomX];
 					}
 					catch (ArrayIndexOutOfBoundsException e) {
 						shipComplete = false;
@@ -122,7 +135,7 @@ public class Player {
 	}
 
 	/**
-	 * Reset the playerCells that got set to be part of a ship back to water.
+	 * Helper method for randomizing the ship locations.
 	 */
 	private void resetShipCells(int x, int y, int i, boolean tryRight) {
 		Cell currentCell;
@@ -130,37 +143,11 @@ public class Player {
 		i--;
 		for (; i >= 0; i--) {
 			if (tryRight)
-				currentCell = playerCells[x][y + i];
+				currentCell = playerCells[y][x + i];
 			else
-				currentCell = playerCells[x + i][y];
+				currentCell = playerCells[y + i][x];
 			currentCell.cellType = WATER;
 		}
-	}
-
-	/**
-	 * Returns true if the cell has NOT already been shot at, false otherwise.  Triggers the grid
-	 * changed listener.
-	 */
-	public boolean opponentShotMissile(int x, int y) {
-		// Check if cell has already been shot at
-		if (playerCells[x][y].isShot)
-			return false;
-
-		playerCells[x][y].isShot = true;
-		if (mOnPlayerGridChangedListener != null)
-			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[x][y].cellType.equals(SHIP));
-
-		return true;
-	}
-
-	/**
-	 * Changes the opponent's grid according to the missile fired.
-	 */
-	public void playerShotMissile(int x, int y, boolean hit) {
-		opponentCells[x][y].isShot = true;
-		opponentCells[x][y].cellType = hit ? SHIP : WATER;
-		if (mOnOpponentGridChangedListener != null)
-			mOnOpponentGridChangedListener.onOpponentGridChanged(x, y, opponentCells[x][y].cellType.equals(SHIP));
 	}
 
 
@@ -171,5 +158,33 @@ public class Player {
 	private class Cell {
 		public String cellType = WATER;     // Either water or a ship
 		public boolean isShot = false;      // True if the cell has already been shot at
+	}
+
+
+	/****************** LISTENERS ******************/
+
+
+	// Player's grid
+	public interface OnPlayerGridChangedListener {
+		public void onPlayerGridChanged(int x, int y, boolean isHit);
+	}
+	OnPlayerGridChangedListener mOnPlayerGridChangedListener = null;
+	public void setOnPlayerGridChangedListener(OnPlayerGridChangedListener onPlayerGridChangedListener) {
+		mOnPlayerGridChangedListener = onPlayerGridChangedListener;
+	}
+	public OnPlayerGridChangedListener getPlayerOnGridChangedListener() {
+		return mOnPlayerGridChangedListener;
+	}
+
+	// Opponent's grid
+	public interface OnOpponentGridChangedListener {
+		public void onOpponentGridChanged(int x, int y, boolean isHit);
+	}
+	OnOpponentGridChangedListener mOnOpponentGridChangedListener = null;
+	public void setOnOpponentGridChangedListener(OnOpponentGridChangedListener onOpponentGridChangedListener) {
+		mOnOpponentGridChangedListener = onOpponentGridChangedListener;
+	}
+	public OnOpponentGridChangedListener getOnOpponentGridChangedListener() {
+		return mOnOpponentGridChangedListener;
 	}
 }
