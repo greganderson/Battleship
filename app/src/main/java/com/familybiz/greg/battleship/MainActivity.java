@@ -9,6 +9,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 
+/**
+ * Created by Greg Anderson
+ */
 public class MainActivity extends Activity {
 
     @Override
