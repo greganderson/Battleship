@@ -9,8 +9,8 @@ public class Player {
 
 	public static final String SHIP = "ship";
 	public static final String WATER = "water";
-	private final int GRID_HEIGHT = 10;
-	private final int GRID_WIDTH = 10;
+	public static final int GRID_HEIGHT = 10;
+	public static final int GRID_WIDTH = 10;
 
 	private Cell[][] playerCells;
 	private Cell[][] opponentCells;
@@ -77,8 +77,6 @@ public class Player {
 	public void playerShotMissile(int x, int y, boolean hit) {
 		opponentCells[y][x].isShot = true;
 		opponentCells[y][x].cellType = hit ? SHIP : WATER;
-		if (mOnOpponentGridChangedListener != null)
-			mOnOpponentGridChangedListener.onOpponentGridChanged(x, y, opponentCells[y][x].cellType.equals(SHIP));
 	}
 
 	/**
