@@ -7,8 +7,8 @@ import java.util.Random;
  */
 public class Player {
 
-	public final String SHIP = "ship";
-	public final String WATER = "water";
+	public static final String SHIP = "ship";
+	public static final String WATER = "water";
 	private final int GRID_HEIGHT = 10;
 	private final int GRID_WIDTH = 10;
 

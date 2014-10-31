@@ -18,9 +18,16 @@ public class GridFragment extends Fragment {
 		GridView gridView = new GridView(getActivity());
 		gridView.setBackgroundColor(Color.BLACK);
 
+		Player player = new Player();
+		String[][] cells = player.getCells();
+
 		for (int y = 0; y < 10; y++) {
 			for (int x = 0; x < 10; x++) {
 				CellView c = new CellView(getActivity(), x, y);
+
+				// Set color of cell to gray if a ship, blue otherwise
+				c.setBackgroundColor(cells[y][x].equals(Player.SHIP) ? Color.DKGRAY : Color.BLUE);
+
 				c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
 					@Override
 					public void onCellTouched(int x, int y) {
