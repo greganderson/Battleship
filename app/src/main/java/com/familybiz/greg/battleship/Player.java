@@ -15,6 +15,9 @@ public class Player {
 	private Cell[][] playerCells;
 	private Cell[][] opponentCells;
 
+	private int numberOfShipCells = 2 + 3 + 3 + 4 + 5;
+	private int numberOfHits = 0;
+
 	public Player() {
 		playerCells = new Cell[GRID_WIDTH][GRID_HEIGHT];
 		opponentCells = new Cell[GRID_WIDTH][GRID_HEIGHT];
@@ -63,10 +66,17 @@ public class Player {
 		// Check if cell has already been shot at
 		if (playerCells[y][x].isShot)
 			return false;
+		if (playerCells[y][x].cellType == SHIP)
+			numberOfHits++;
 
 		playerCells[y][x].isShot = true;
+
 		if (mOnPlayerGridChangedListener != null)
 			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[y][x].cellType.equals(SHIP));
+
+		if (numberOfHits == numberOfShipCells)
+			if (mOnAllShipsDestroyedListener != null)
+				mOnAllShipsDestroyedListener.onAllShipsDestroyed();
 
 		return true;
 	}
@@ -192,5 +202,17 @@ public class Player {
 	}
 	public OnOpponentGridChangedListener getOnOpponentGridChangedListener() {
 		return mOnOpponentGridChangedListener;
+	}
+
+	// All ships have been destroyed
+	public interface OnAllShipsDestroyedListener {
+		public void onAllShipsDestroyed();
+	}
+	private OnAllShipsDestroyedListener mOnAllShipsDestroyedListener = null;
+	public void setOnAllShipsDestroyedListener(OnAllShipsDestroyedListener onAllShipsDestroyedListener) {
+		mOnAllShipsDestroyedListener = onAllShipsDestroyedListener;
+	}
+	public OnAllShipsDestroyedListener getOnAllShipsDestroyedListener() {
+		return mOnAllShipsDestroyedListener;
 	}
 }

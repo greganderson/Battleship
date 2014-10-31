@@ -15,7 +15,9 @@ import java.util.TimerTask;
 /**
  * Created by Greg Anderson
  */
-public class GridFragment extends Fragment implements Player.OnPlayerGridChangedListener {
+public class GridFragment extends Fragment implements Player.OnPlayerGridChangedListener, Player.OnAllShipsDestroyedListener {
+
+	public static String PLAYER_TURN = "player_turn";
 
 	private Player mPlayer1;
 	private Player mPlayer2;
@@ -34,6 +36,8 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mTimer = new Timer();
+
+		getActivity().setTitle("Player 1");
 
 		mRootLayout = new LinearLayout(getActivity());
 		mRootLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -56,13 +60,16 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		mPlayer1.setOnPlayerGridChangedListener(this);
 		mPlayer2.setOnPlayerGridChangedListener(this);
 
+		mPlayer1.setOnAllShipsDestroyedListener(this);
+		mPlayer2.setOnAllShipsDestroyedListener(this);
+
 		String[][] shipCellsPlayer1 = mPlayer1.getShipCells();
 		String[][] shipCellsPlayer2 = mPlayer2.getShipCells();
 
 		initializePlayerShipCells(mPlayer1PlayerGrid, shipCellsPlayer1);
-		initializeOpenWaterCells(mPlayer1OpponentGrid);
+		initializeOpenWaterCells(mPlayer1OpponentGrid, true);
 		initializePlayerShipCells(mPlayer2PlayerGrid, shipCellsPlayer2);
-		initializeOpenWaterCells(mPlayer2OpponentGrid);
+		initializeOpenWaterCells(mPlayer2OpponentGrid, false);
 
 		mRootLayout.addView(mPlayer1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 		mRootLayout.addView(mPlayer1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
@@ -86,19 +93,30 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		}
 	}
 
-	private void initializeOpenWaterCells(GridView view) {
+	private void initializeOpenWaterCells(GridView view, boolean isPlayer1) {
 		for (int y = 0; y < 10; y++) {
 			for (int x = 0; x < 10; x++) {
 				CellView c = new CellView(getActivity(), x, y);
 				c.setBackgroundColor(GridView.CELL_COLOR_WATER);
 
-				c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
-					@Override
-					public void onCellTouched(int x, int y) {
-						if (!mPlayer2.opponentShotMissile(x, y))
-							Toast.makeText(getActivity(), "Invalid shot", Toast.LENGTH_SHORT).show();
-					}
-				});
+				if (isPlayer1) {
+					c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
+						@Override
+						public void onCellTouched(int x, int y) {
+							if (!mPlayer2.opponentShotMissile(x, y))
+								Toast.makeText(getActivity(), "Invalid shot", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+				else {
+					c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
+						@Override
+						public void onCellTouched(int x, int y) {
+							if (!mPlayer1.opponentShotMissile(x, y))
+								Toast.makeText(getActivity(), "Invalid shot", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
 
 				view.addView(c);
 			}
@@ -120,6 +138,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 			mPlayer2PlayerGrid.setVisibility(View.GONE);
 			mPlayer2OpponentGrid.setVisibility(View.GONE);
 		}
+		getActivity().setTitle("Player " + (mTurnPlayer1 ? 1 : 2));
 	}
 
 	@Override
@@ -137,10 +156,17 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		mTimer.schedule(new GameTimer(), 2000);
 	}
 
+	@Override
+	public void onAllShipsDestroyed() {
+
+		Toast.makeText(getActivity(), "Player " + (mTurnPlayer1 ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
+	}
+
 	private class GameTimer extends TimerTask {
 		@Override
 		public void run() {
 			Intent intent = new Intent();
+			intent.putExtra(PLAYER_TURN, !mTurnPlayer1);
 			intent.setClass(getActivity(), TransitionActivity.class);
 			startActivityForResult(intent, 1);
 		}

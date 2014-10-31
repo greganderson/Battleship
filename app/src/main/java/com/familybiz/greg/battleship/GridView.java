@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 public class GridView extends ViewGroup {
 
 	public static final int CELL_COLOR_WATER = Color.BLUE;
-	public static final int CELL_COLOR_SHIP = Color.DKGRAY;
+	public static final int CELL_COLOR_SHIP = Color.GRAY;
 	public static final int CELL_COLOR_MISS = Color.WHITE;
 	public static final int CELL_COLOR_HIT = Color.RED;
 
