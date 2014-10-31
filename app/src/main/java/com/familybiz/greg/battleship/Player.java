@@ -39,11 +39,19 @@ public class Player {
 	/**
 	 * Returns a 2D array of strings containing the cell types.
 	 */
-	public String[][] getCells() {
+	public String[][] getShipCells() {
+		return getCells(true);
+	}
+
+	public String[][] getOpponentCells() {
+		return getCells(false);
+	}
+
+	private String[][] getCells(boolean getShipCells) {
 		String[][] cells = new String[GRID_WIDTH][GRID_HEIGHT];
 		for (int y = 0; y < playerCells.length; y++)
 			for (int x = 0; x < playerCells.length; x++)
-			cells[y][x] = playerCells[y][x].cellType;
+				cells[y][x] = getShipCells ? playerCells[y][x].cellType : WATER;
 		return cells;
 	}
 

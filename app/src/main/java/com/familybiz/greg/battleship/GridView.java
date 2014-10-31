@@ -2,6 +2,7 @@ package com.familybiz.greg.battleship;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ public class GridView extends ViewGroup {
 
     public GridView(Context context) {
         super(context);
+	    setBackgroundColor(Color.BLACK);
     }
 
 	@Override

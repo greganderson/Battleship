@@ -19,26 +19,30 @@ public class GridFragment extends Fragment {
 		LinearLayout rootLayout = new LinearLayout(getActivity());
 		rootLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-		GridView gridViewPlayer1 = new GridView(getActivity());
-		GridView gridViewPlayer2 = new GridView(getActivity());
-		gridViewPlayer1.setBackgroundColor(Color.BLACK);
-		gridViewPlayer2.setBackgroundColor(Color.BLACK);
+		GridView player1PlayerGrid = new GridView(getActivity());
+		GridView player1OpponentGrid = new GridView(getActivity());
+		GridView player2PlayerGrid = new GridView(getActivity());
+		GridView player2OpponentGrid = new GridView(getActivity());
 
 		Player player1 = new Player();
 		Player player2 = new Player();
-		String[][] cellsPlayer1 = player1.getCells();
-		String[][] cellsPlayer2 = player2.getCells();
 
-		initializePlayerCells(gridViewPlayer1, cellsPlayer1);
-		initializePlayerCells(gridViewPlayer2, cellsPlayer2);
+		String[][] shipCellsPlayer1 = player1.getShipCells();
+		String[][] shipCellsPlayer2 = player2.getShipCells();
+		String[][] blankCells = player1.getOpponentCells();
 
-		rootLayout.addView(gridViewPlayer1, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-		rootLayout.addView(gridViewPlayer2, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		initializePlayerShipCells(player1PlayerGrid, shipCellsPlayer1);
+		initializePlayerShipCells(player1OpponentGrid, blankCells);
+		initializePlayerShipCells(player2PlayerGrid, shipCellsPlayer2);
+		initializePlayerShipCells(player2OpponentGrid, blankCells);
+
+		rootLayout.addView(player1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		rootLayout.addView(player1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 
 		return rootLayout;
 	}
 
-	private void initializePlayerCells(GridView view, String[][] cells) {
+	private void initializePlayerShipCells(GridView view, String[][] cells) {
 		for (int y = 0; y < 10; y++) {
 			for (int x = 0; x < 10; x++) {
 				CellView c = new CellView(getActivity(), x, y);
