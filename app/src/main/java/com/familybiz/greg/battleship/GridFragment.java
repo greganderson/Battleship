@@ -1,6 +1,7 @@
 package com.familybiz.greg.battleship;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,47 +9,68 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Greg Anderson
  */
 public class GridFragment extends Fragment implements Player.OnPlayerGridChangedListener {
 
-	private Player player1;
-	private Player player2;
+	private Player mPlayer1;
+	private Player mPlayer2;
+
+	private boolean mTurnPlayer1 = true;
+
+	private LinearLayout mRootLayout;
 
 	private GridView mPlayer1PlayerGrid;
 	private GridView mPlayer2PlayerGrid;
 	private GridView mPlayer1OpponentGrid;
 	private GridView mPlayer2OpponentGrid;
 
+	private Timer mTimer;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		LinearLayout rootLayout = new LinearLayout(getActivity());
-		rootLayout.setOrientation(LinearLayout.HORIZONTAL);
+		mTimer = new Timer();
+
+		mRootLayout = new LinearLayout(getActivity());
+		mRootLayout.setOrientation(LinearLayout.HORIZONTAL);
 
 		mPlayer1PlayerGrid = new GridView(getActivity());
+		mPlayer1PlayerGrid.setVisibility(View.VISIBLE);
+
 		mPlayer1OpponentGrid = new GridView(getActivity());
+		mPlayer1OpponentGrid.setVisibility(View.VISIBLE);
+
 		mPlayer2PlayerGrid = new GridView(getActivity());
+		mPlayer2PlayerGrid.setVisibility(View.GONE);
+
 		mPlayer2OpponentGrid = new GridView(getActivity());
+		mPlayer2OpponentGrid.setVisibility(View.GONE);
 
-		player1 = new Player();
-		player2 = new Player();
+		mPlayer1 = new Player();
+		mPlayer2 = new Player();
 
-		player1.setOnPlayerGridChangedListener(this);
-		player2.setOnPlayerGridChangedListener(this);
+		mPlayer1.setOnPlayerGridChangedListener(this);
+		mPlayer2.setOnPlayerGridChangedListener(this);
 
-		String[][] shipCellsPlayer1 = player1.getShipCells();
-		String[][] shipCellsPlayer2 = player2.getShipCells();
+		String[][] shipCellsPlayer1 = mPlayer1.getShipCells();
+		String[][] shipCellsPlayer2 = mPlayer2.getShipCells();
 
 		initializePlayerShipCells(mPlayer1PlayerGrid, shipCellsPlayer1);
 		initializeOpenWaterCells(mPlayer1OpponentGrid);
 		initializePlayerShipCells(mPlayer2PlayerGrid, shipCellsPlayer2);
 		initializeOpenWaterCells(mPlayer2OpponentGrid);
 
-		rootLayout.addView(mPlayer1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-		rootLayout.addView(mPlayer1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		mRootLayout.addView(mPlayer1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		mRootLayout.addView(mPlayer1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 
-		return rootLayout;
+		mRootLayout.addView(mPlayer2PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		mRootLayout.addView(mPlayer2OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+
+		return mRootLayout;
 	}
 
 	private void initializePlayerShipCells(GridView view, String[][] cells) {
@@ -73,9 +95,8 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 				c.setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
 					@Override
 					public void onCellTouched(int x, int y) {
-						if (!player2.opponentShotMissile(x, y))
+						if (!mPlayer2.opponentShotMissile(x, y))
 							Toast.makeText(getActivity(), "Invalid shot", Toast.LENGTH_SHORT).show();
-						//
 					}
 				});
 
@@ -84,9 +105,50 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		}
 	}
 
+	private void nextTurn() {
+		if (mTurnPlayer1) {
+			mTurnPlayer1 = false;
+			mPlayer1PlayerGrid.setVisibility(View.GONE);
+			mPlayer1OpponentGrid.setVisibility(View.GONE);
+			mPlayer2PlayerGrid.setVisibility(View.VISIBLE);
+			mPlayer2OpponentGrid.setVisibility(View.VISIBLE);
+		}
+		else {
+			mTurnPlayer1 = true;
+			mPlayer1PlayerGrid.setVisibility(View.VISIBLE);
+			mPlayer1OpponentGrid.setVisibility(View.VISIBLE);
+			mPlayer2PlayerGrid.setVisibility(View.GONE);
+			mPlayer2OpponentGrid.setVisibility(View.GONE);
+		}
+	}
+
 	@Override
 	public void onPlayerGridChanged(int x, int y, boolean isHit) {
-		player1.playerShotMissile(x, y, isHit);
-		mPlayer1OpponentGrid.setCellColor(x, y, isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS);
+		if (mTurnPlayer1) {
+			mPlayer1.playerShotMissile(x, y, isHit);
+			mPlayer1OpponentGrid.setCellColor(x, y, isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS);
+		}
+		else {
+			mPlayer2.playerShotMissile(x, y, isHit);
+			mPlayer2OpponentGrid.setCellColor(x, y, isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS);
+		}
+		Toast.makeText(getActivity(), isHit ? "Hit!" : "Miss", Toast.LENGTH_SHORT).show();
+
+		mTimer.schedule(new GameTimer(), 2000);
+	}
+
+	private class GameTimer extends TimerTask {
+		@Override
+		public void run() {
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), TransitionActivity.class);
+			startActivityForResult(intent, 1);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		nextTurn();
 	}
 }
