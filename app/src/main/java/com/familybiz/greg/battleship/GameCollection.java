@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 
+/**
+ * Singleton class representing a collection of in progress and completed games.
+ */
 public class GameCollection {
 
 	private static GameCollection mInstance = null;

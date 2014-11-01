@@ -103,7 +103,7 @@ public class GameListFragment extends Fragment implements ListAdapter {
 	public View getView(int i, View view, ViewGroup viewGroup) {
 		GameCollection.GameDetail[] games = GameCollection.getInstance().getListOfGames();
 		TextView v = new TextView(getActivity());
-		v.setText(games[i].name);
+		v.setText(games[i].name + ": " + (games[i].inProgress ? "in progress" : "completed"));
 		return v;
 	}
 
