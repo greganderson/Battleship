@@ -33,26 +33,39 @@ public class GameCollection {
 			mOnGameCollectionChangedListener.onGameCollectionChanged();
 	}
 
+	/**
+	 * Returns a sorted array of game details.
+	 */
 	public GameDetail[] getListOfGames() {
 		GameDetail[] result = new GameDetail[mGames.size()];
 		for (int i = 0; i < mGames.size(); i++)
-			result[i] = new GameDetail(convertDateToString(mGames.get(i).timeStarted), mGames.get(i).isDone);
+			result[i] = new GameDetail(
+					convertDateToString(mGames.get(i).timeStarted),
+					mGames.get(i).isDone);
 
+		// Alphabetize!!
 		Arrays.sort(result, new Comparator<Object>() {
 			@Override
 			public int compare(Object game1, Object game2) {
 				return ((GameDetail)game1).name.compareTo(((GameDetail)game2).name);
 			}
 		});
+
 		return result;
 	}
 
+	/**
+	 * Changes the string format of a string to be smaller and hopefully easier to read.
+	 */
 	private String convertDateToString(Date date) {
 		String sDate = date.toString();
 		return sDate.substring(sDate.indexOf(' '), sDate.length()-9);
 	}
 
 
+	/**
+	 * Contains all the information needed for a game.
+	 */
 	private class Game {
 		public String[][] player1Cells;
 		public String[][] player2Cells;
@@ -80,6 +93,9 @@ public class GameCollection {
 	}
 
 
+	/**
+	 * Represents the information to display on the list view.
+	 */
 	public class GameDetail {
 		public String name;
 		public boolean inProgress;
