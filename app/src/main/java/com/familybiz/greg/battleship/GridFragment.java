@@ -180,6 +180,10 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		}
 	}
 
+	public void saveAndClose() {
+		clearListeners();
+	}
+
 	/**
 	 * Removes all listeners.
 	 */
