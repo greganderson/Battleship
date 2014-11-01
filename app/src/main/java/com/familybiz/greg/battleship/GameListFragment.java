@@ -18,6 +18,8 @@ import android.widget.TextView;
  */
 public class GameListFragment extends Fragment implements ListAdapter {
 
+	private Button mNewGameButton;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		LinearLayout rootLayout = new LinearLayout(getActivity());
@@ -30,16 +32,16 @@ public class GameListFragment extends Fragment implements ListAdapter {
 				1));
 		gameListView.setAdapter(this);
 
-		Button newGameButton = new Button(getActivity());
-		newGameButton.setText(getString(R.string.new_game_button_text));
+		mNewGameButton = new Button(getActivity());
+		mNewGameButton.setText(getString(R.string.new_game_button_text));
 		LinearLayout.LayoutParams newGameButtonParams = new LinearLayout.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				0);
 		newGameButtonParams.gravity = Gravity.CENTER;
-		rootLayout.addView(newGameButton, newGameButtonParams);
+		rootLayout.addView(mNewGameButton, newGameButtonParams);
 
-		newGameButton.setOnClickListener(new View.OnClickListener() {
+		mNewGameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (mOnNewGameButtonClickedListener != null)
@@ -49,6 +51,10 @@ public class GameListFragment extends Fragment implements ListAdapter {
 
 
 		return rootLayout;
+	}
+
+	public void setNewGameButtonStatus(boolean enabled) {
+		mNewGameButton.setClickable(enabled);
 	}
 
 	@Override

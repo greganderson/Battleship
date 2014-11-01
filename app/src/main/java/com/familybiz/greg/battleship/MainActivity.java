@@ -12,9 +12,10 @@ import android.widget.LinearLayout;
 /**
  * Created by Greg Anderson
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements GridFragment.OnChangeTurnListener {
 
 	GridFragment mGridFragment;
+	GameListFragment mGameListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,24 +41,32 @@ public class MainActivity extends Activity {
 			    ViewGroup.LayoutParams.MATCH_PARENT,
 			    80));
 
-	    GameListFragment gameListFragment = new GameListFragment();
+	    mGameListFragment = new GameListFragment();
 	    mGridFragment = new GridFragment();
+	    mGridFragment.setOnChangeTurnListener(this);
 
-	    gameListFragment.setOnNewGameButtonClickedListener(new GameListFragment.OnNewGameButtonClickedListener() {
+	    mGameListFragment.setOnNewGameButtonClickedListener(new GameListFragment.OnNewGameButtonClickedListener() {
 		    @Override
 		    public void onNewGameButtonClicked() {
 			    mGridFragment.saveAndClose();
+			    mGridFragment.setOnChangeTurnListener(null);
 			    FragmentTransaction removeTransaction = getFragmentManager().beginTransaction();
 			    removeTransaction.remove(mGridFragment).commit();
 			    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
 			    mGridFragment = new GridFragment();
+			    mGridFragment.setOnChangeTurnListener(MainActivity.this);
 			    addTransaction.add(11, mGridFragment).commit();
 		    }
 	    });
 
 	    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
-	    addTransaction.add(10, gameListFragment);
+	    addTransaction.add(10, mGameListFragment);
 	    addTransaction.add(11, mGridFragment);
 	    addTransaction.commit();
     }
+
+	@Override
+	public void onChangeTurn(boolean inProgress) {
+		mGameListFragment.setNewGameButtonStatus(!inProgress);
+	}
 }

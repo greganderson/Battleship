@@ -160,6 +160,8 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		}
 		Toast.makeText(getActivity(), isHit ? "Hit!" : "Miss", Toast.LENGTH_SHORT).show();
 
+		if (mOnChangeTurnListener != null)
+			mOnChangeTurnListener.onChangeTurn(true);
 		mTimer.schedule(new GameTimer(), 2000);
 	}
 
@@ -206,6 +208,23 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if (mOnChangeTurnListener != null)
+			mOnChangeTurnListener.onChangeTurn(false);
 		nextTurn();
+	}
+
+
+	/****************** LISTENERS ******************/
+
+
+	public interface OnChangeTurnListener {
+		public void onChangeTurn(boolean inProgress);
+	}
+	OnChangeTurnListener mOnChangeTurnListener = null;
+	public void setOnChangeTurnListener(OnChangeTurnListener onChangeTurnListener) {
+		mOnChangeTurnListener = onChangeTurnListener;
+	}
+	public OnChangeTurnListener getOnChangeTurnListener() {
+		return mOnChangeTurnListener;
 	}
 }
