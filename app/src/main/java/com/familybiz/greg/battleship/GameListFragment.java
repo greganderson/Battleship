@@ -25,12 +25,19 @@ public class GameListFragment extends Fragment implements ListAdapter {
 		LinearLayout rootLayout = new LinearLayout(getActivity());
 		rootLayout.setOrientation(LinearLayout.VERTICAL);
 
-		ListView gameListView = new ListView(getActivity());
+		final ListView gameListView = new ListView(getActivity());
 		rootLayout.addView(gameListView, new LinearLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT,
 				0,
 				1));
 		gameListView.setAdapter(this);
+
+		GameCollection.getInstance().setOnGameCollectionChangedListener(new GameCollection.OnGameCollectionChangedListener() {
+			@Override
+			public void onGameCollectionChanged() {
+				gameListView.invalidateViews();
+			}
+		});
 
 		mNewGameButton = new Button(getActivity());
 		mNewGameButton.setText(getString(R.string.new_game_button_text));
@@ -64,7 +71,7 @@ public class GameListFragment extends Fragment implements ListAdapter {
 
 	@Override
 	public int getCount() {
-		return GameCollection.getInstance().getListOfGames().size();
+		return GameCollection.getInstance().getListOfGames().length;
 	}
 
 	@Override
@@ -94,8 +101,9 @@ public class GameListFragment extends Fragment implements ListAdapter {
 
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup) {
+		GameCollection.GameDetail[] games = GameCollection.getInstance().getListOfGames();
 		TextView v = new TextView(getActivity());
-		v.setText("Hello");
+		v.setText(games[i].name);
 		return v;
 	}
 

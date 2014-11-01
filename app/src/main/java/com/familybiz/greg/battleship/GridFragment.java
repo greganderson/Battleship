@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,12 +33,14 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	private GridView mPlayer1OpponentGrid;
 	private GridView mPlayer2OpponentGrid;
 
-	private boolean inProgress;
+	private Date mTimeStarted;
+	private boolean mInProgress;
 	private Timer mTimer;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		inProgress = true;
+		mTimeStarted = new Date();
+		mInProgress = true;
 		mTimer = new Timer();
 
 		getActivity().setTitle("Player 1");
@@ -167,7 +170,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	@Override
 	public void onAllShipsDestroyed() {
-		inProgress = false;
+		mInProgress = false;
 		clearListeners();
 		Toast.makeText(getActivity(), "Player " + (mTurnPlayer1 ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
 	}
@@ -184,6 +187,14 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	public void saveAndClose() {
 		clearListeners();
+		GameCollection.getInstance().addGame(
+				mPlayer1.getShipCells(),
+				mPlayer2.getShipCells(),
+				mPlayer1.getOpponentCells(),
+				mPlayer2.getOpponentCells(),
+				mTurnPlayer1,
+				mInProgress,
+				mTimeStarted);
 	}
 
 	/**
