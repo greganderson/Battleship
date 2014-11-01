@@ -6,5 +6,6 @@
     <string name="transition_view_name">Next Player</string>
 
     <string name="close_button_text">Ready!</string>
+    <string name="new_game_button_text">New Game</string>
 
 </resources>

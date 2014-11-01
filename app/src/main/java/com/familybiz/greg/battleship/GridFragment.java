@@ -2,6 +2,7 @@ package com.familybiz.greg.battleship;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,15 +45,19 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 		mPlayer1PlayerGrid = new GridView(getActivity());
 		mPlayer1PlayerGrid.setVisibility(View.VISIBLE);
+		mPlayer1PlayerGrid.setBackgroundColor(Color.BLACK);
 
 		mPlayer1OpponentGrid = new GridView(getActivity());
 		mPlayer1OpponentGrid.setVisibility(View.VISIBLE);
+		mPlayer1OpponentGrid.setBackgroundColor(Color.WHITE);
 
 		mPlayer2PlayerGrid = new GridView(getActivity());
 		mPlayer2PlayerGrid.setVisibility(View.GONE);
+		mPlayer2PlayerGrid.setBackgroundColor(Color.BLACK);
 
 		mPlayer2OpponentGrid = new GridView(getActivity());
 		mPlayer2OpponentGrid.setVisibility(View.GONE);
+		mPlayer2OpponentGrid.setBackgroundColor(Color.WHITE);
 
 		mPlayer1 = new Player();
 		mPlayer2 = new Player();

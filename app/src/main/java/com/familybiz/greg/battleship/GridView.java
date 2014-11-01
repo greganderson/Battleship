@@ -20,7 +20,6 @@ public class GridView extends ViewGroup {
 
     public GridView(Context context) {
         super(context);
-	    setBackgroundColor(Color.BLACK);
     }
 
 	public void setCellColor(int x, int y, int color) {
