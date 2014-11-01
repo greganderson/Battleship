@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
  */
 public class MainActivity extends Activity {
 
+	GridFragment mGridFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,11 +41,23 @@ public class MainActivity extends Activity {
 			    80));
 
 	    GameListFragment gameListFragment = new GameListFragment();
-	    GridFragment gridFragment = new GridFragment();
+	    mGridFragment = new GridFragment();
+
+	    gameListFragment.setOnNewGameButtonClickedListener(new GameListFragment.OnNewGameButtonClickedListener() {
+		    @Override
+		    public void onNewGameButtonClicked() {
+			    mGridFragment.saveAndClose();
+			    FragmentTransaction removeTransaction = getFragmentManager().beginTransaction();
+			    removeTransaction.remove(mGridFragment).commit();
+			    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
+			    mGridFragment = new GridFragment();
+			    addTransaction.add(11, mGridFragment).commit();
+		    }
+	    });
 
 	    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
 	    addTransaction.add(10, gameListFragment);
-	    addTransaction.add(11, gridFragment);
+	    addTransaction.add(11, mGridFragment);
 	    addTransaction.commit();
     }
 }
