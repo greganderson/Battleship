@@ -32,10 +32,12 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	private GridView mPlayer1OpponentGrid;
 	private GridView mPlayer2OpponentGrid;
 
+	private boolean inProgress;
 	private Timer mTimer;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		inProgress = true;
 		mTimer = new Timer();
 
 		getActivity().setTitle("Player 1");
@@ -163,7 +165,8 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	@Override
 	public void onAllShipsDestroyed() {
-
+		inProgress = false;
+		clearListeners();
 		Toast.makeText(getActivity(), "Player " + (mTurnPlayer1 ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
 	}
 
@@ -175,6 +178,25 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 			intent.setClass(getActivity(), TransitionActivity.class);
 			startActivityForResult(intent, 1);
 		}
+	}
+
+	/**
+	 * Removes all listeners.
+	 */
+	private void clearListeners() {
+		// CellView touch
+		for (int i = 0; i < mPlayer1OpponentGrid.getChildCount(); i++)
+			((CellView)mPlayer1OpponentGrid.getChildAt(i)).setOnCellTouchedListener(null);
+		for (int i = 0; i < mPlayer2OpponentGrid.getChildCount(); i++)
+			((CellView)mPlayer2OpponentGrid.getChildAt(i)).setOnCellTouchedListener(null);
+
+		// All ships destroyed
+		mPlayer1.setOnAllShipsDestroyedListener(null);
+		mPlayer2.setOnAllShipsDestroyedListener(null);
+
+		// Opponent grid change
+		mPlayer1.setOnPlayerGridChangedListener(null);
+		mPlayer2.setOnPlayerGridChangedListener(null);
 	}
 
 	@Override

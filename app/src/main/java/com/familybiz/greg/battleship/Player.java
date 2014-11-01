@@ -171,7 +171,7 @@ public class Player {
 	 * Represents one cell on the battleship grid.  Contains the type of cell (cell contains part of
 	 * a ship or cell is water) as well as whether the cell has been shot at.
 	 */
-	private class Cell {
+	public class Cell {
 		public String cellType = WATER;     // Either water or a ship
 		public boolean isShot = false;      // True if the cell has already been shot at
 	}
@@ -190,18 +190,6 @@ public class Player {
 	}
 	public OnPlayerGridChangedListener getPlayerOnGridChangedListener() {
 		return mOnPlayerGridChangedListener;
-	}
-
-	// Opponent's grid
-	public interface OnOpponentGridChangedListener {
-		public void onOpponentGridChanged(int x, int y, boolean isHit);
-	}
-	OnOpponentGridChangedListener mOnOpponentGridChangedListener = null;
-	public void setOnOpponentGridChangedListener(OnOpponentGridChangedListener onOpponentGridChangedListener) {
-		mOnOpponentGridChangedListener = onOpponentGridChangedListener;
-	}
-	public OnOpponentGridChangedListener getOnOpponentGridChangedListener() {
-		return mOnOpponentGridChangedListener;
 	}
 
 	// All ships have been destroyed
