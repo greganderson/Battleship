@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Created by Greg Anderson
@@ -38,38 +39,46 @@ public class GameListFragment extends Fragment implements ListAdapter {
 		newGameButtonParams.gravity = Gravity.CENTER;
 		rootLayout.addView(newGameButton, newGameButtonParams);
 
+		newGameButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (mOnNewGameButtonClickedListener != null)
+					mOnNewGameButtonClickedListener.onNewGameButtonClicked();
+			}
+		});
+
 
 		return rootLayout;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return false;
+		return getCount() == 0;
 	}
 
 	@Override
 	public int getCount() {
-		return 0;
+		return GameCollection.getInstance().getListOfGames().size();
 	}
 
 	@Override
 	public boolean hasStableIds() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public Object getItem(int i) {
-		return null;
+		return i;
 	}
 
 	@Override
 	public long getItemId(int i) {
-		return 0;
+		return i;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		return 0;
+		return 1;
 	}
 
 	@Override
@@ -79,26 +88,41 @@ public class GameListFragment extends Fragment implements ListAdapter {
 
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup) {
-		return null;
+		TextView v = new TextView(getActivity());
+		v.setText("Hello");
+		return v;
 	}
 
 	@Override
 	public boolean areAllItemsEnabled() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isEnabled(int i) {
-		return false;
+		return true;
 	}
 
 	@Override
-	public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-
-	}
+	public void registerDataSetObserver(DataSetObserver dataSetObserver) { }
 
 	@Override
-	public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
+	public void unregisterDataSetObserver(DataSetObserver dataSetObserver) { }
 
+
+	/****************** LISTENERS ******************/
+
+
+	// New game button listener
+
+	public interface OnNewGameButtonClickedListener {
+		public void onNewGameButtonClicked();
+	}
+	private OnNewGameButtonClickedListener mOnNewGameButtonClickedListener = null;
+	public void setOnNewGameButtonClickedListener(OnNewGameButtonClickedListener onNewGameButtonClickedListener) {
+		mOnNewGameButtonClickedListener = onNewGameButtonClickedListener;
+	}
+	public OnNewGameButtonClickedListener getOnNewGameButtonClickedListener() {
+		return mOnNewGameButtonClickedListener;
 	}
 }
