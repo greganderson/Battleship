@@ -133,6 +133,34 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		}
 	}
 
+	/**
+	 * Updates the cells in the given grid view to match the cell types of cells.
+	 */
+	private void updateCells(GridView view, String[][] cells) {
+		for (int i = 0; i < view.getChildCount(); i++) {
+			int x = i % Player.GRID_WIDTH;
+			int y = i / Player.GRID_HEIGHT;
+			CellView cell = (CellView)view.getChildAt(i);
+
+			String cellType = cells[y][x];
+
+			// Get color to set
+			int color = -1;
+			if (cellType.equals(Player.SHIP))
+				color = GridView.CELL_COLOR_SHIP;
+			else if (cellType.equals(Player.WATER))
+				color = GridView.CELL_COLOR_WATER;
+			else if (cellType.equals(Player.HIT))
+				color = GridView.CELL_COLOR_HIT;
+			else if (cellType.equals(Player.MISS))
+				color = GridView.CELL_COLOR_MISS;
+			else
+				color = Color.BLACK;
+
+			cell.setBackgroundColor(color);
+		}
+	}
+
 	private void nextTurn() {
 		if (mTurnPlayer1) {
 			mTurnPlayer1 = false;
@@ -187,7 +215,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	public void saveAndClose() {
 		clearListeners();
-		GameCollection.getInstance().addGame(
+		GameCollection.getInstance().saveGame(
 				mPlayer1.getShipCells(),
 				mPlayer2.getShipCells(),
 				mPlayer1.getOpponentCells(),
@@ -195,6 +223,42 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 				mTurnPlayer1,
 				mInProgress,
 				mTimeStarted);
+	}
+
+	public void loadGame(GameCollection.Game game) {
+		// Clear old player listeners
+		clearPlayerListeners();
+
+		mTimeStarted = game.timeStarted;
+		mInProgress = !game.isDone;
+
+		// Set the title to reflect who's turn it is
+		getActivity().setTitle(game.isPlayer1Turn ? "Player 1" : "Player 2");
+
+		// Show the correct grids
+		int player1GridVisibility =  game.isPlayer1Turn ? View.VISIBLE : View.GONE;
+		int player2GridVisibility = !game.isPlayer1Turn ? View.VISIBLE : View.GONE;
+		mPlayer1PlayerGrid.setVisibility(player1GridVisibility);
+		mPlayer1OpponentGrid.setVisibility(player1GridVisibility);
+		mPlayer2PlayerGrid.setVisibility(player2GridVisibility);
+		mPlayer2OpponentGrid.setVisibility(player2GridVisibility);
+
+		// Create new players and overwrite their information
+		mPlayer1 = new Player(game.player1Cells, game.player1Shots);
+		mPlayer2 = new Player(game.player2Cells, game.player2Shots);
+
+		// Update the current grid view's cells to reflect the new cell information.
+		updateCells(mPlayer1PlayerGrid, game.player1Cells);
+		updateCells(mPlayer2PlayerGrid, game.player2Cells);
+		updateCells(mPlayer1OpponentGrid, game.player1Shots);
+		updateCells(mPlayer2OpponentGrid, game.player2Shots);
+
+		// Reset the listeners
+		mPlayer1.setOnPlayerGridChangedListener(this);
+		mPlayer2.setOnPlayerGridChangedListener(this);
+
+		mPlayer1.setOnAllShipsDestroyedListener(this);
+		mPlayer2.setOnAllShipsDestroyedListener(this);
 	}
 
 	/**
@@ -207,6 +271,10 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		for (int i = 0; i < mPlayer2OpponentGrid.getChildCount(); i++)
 			((CellView)mPlayer2OpponentGrid.getChildAt(i)).setOnCellTouchedListener(null);
 
+		clearPlayerListeners();
+	}
+
+	private void clearPlayerListeners() {
 		// All ships destroyed
 		mPlayer1.setOnAllShipsDestroyedListener(null);
 		mPlayer2.setOnAllShipsDestroyedListener(null);

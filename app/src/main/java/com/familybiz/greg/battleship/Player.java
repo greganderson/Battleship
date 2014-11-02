@@ -9,6 +9,8 @@ public class Player {
 
 	public static final String SHIP = "ship";
 	public static final String WATER = "water";
+	public static final String HIT = "hit";
+	public static final String MISS = "miss";
 	public static final int GRID_HEIGHT = 10;
 	public static final int GRID_WIDTH = 10;
 
@@ -19,6 +21,24 @@ public class Player {
 	private int numberOfHits = 0;
 
 	public Player() {
+		initializeCells();
+		initializeShips();
+	}
+
+	public Player(String[][] shipCells, String[][] opponentCells) {
+		initializeCells();
+
+		setCells(shipCells, this.playerCells);
+		setCells(opponentCells, this.opponentCells);
+
+		// Set the number of hits
+		for (int y = 0; y < GRID_HEIGHT; y++)
+			for (int x = 0; x < GRID_WIDTH; x++)
+				if (this.opponentCells[y][x].isShot)
+					numberOfHits++;
+	}
+
+	private void initializeCells() {
 		playerCells = new Cell[GRID_WIDTH][GRID_HEIGHT];
 		opponentCells = new Cell[GRID_WIDTH][GRID_HEIGHT];
 
@@ -35,8 +55,15 @@ public class Player {
 				opponentCells[y][x] = c;
 			}
 		}
+	}
 
-		initializeShips();
+	private void setCells(String[][] srcCells, Cell[][] destCells) {
+		for (int y = 0; y < GRID_HEIGHT; y++) {
+			for (int x = 0; x < GRID_WIDTH; x++) {
+				destCells[y][x].cellType = srcCells[y][x];
+				destCells[y][x].isShot = srcCells[y][x].equals(HIT);
+			}
+		}
 	}
 
 	/**
@@ -54,7 +81,7 @@ public class Player {
 		String[][] cells = new String[GRID_WIDTH][GRID_HEIGHT];
 		for (int y = 0; y < playerCells.length; y++)
 			for (int x = 0; x < playerCells.length; x++)
-				cells[y][x] = getShipCells ? playerCells[y][x].cellType : WATER;
+				cells[y][x] = getShipCells ? playerCells[y][x].cellType : opponentCells[y][x].cellType;
 		return cells;
 	}
 
@@ -66,7 +93,7 @@ public class Player {
 		// Check if cell has already been shot at
 		if (playerCells[y][x].isShot)
 			return false;
-		if (playerCells[y][x].cellType == SHIP)
+		if (playerCells[y][x].cellType.equals(SHIP))
 			numberOfHits++;
 
 		playerCells[y][x].isShot = true;
@@ -86,7 +113,7 @@ public class Player {
 	 */
 	public void playerShotMissile(int x, int y, boolean hit) {
 		opponentCells[y][x].isShot = true;
-		opponentCells[y][x].cellType = hit ? SHIP : WATER;
+		opponentCells[y][x].cellType = hit ? HIT : MISS;
 	}
 
 	/**
@@ -149,6 +176,7 @@ public class Player {
 			}
 		}
 	}
+
 
 	/**
 	 * Helper method for randomizing the ship locations.

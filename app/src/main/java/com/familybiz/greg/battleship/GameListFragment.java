@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -31,6 +32,14 @@ public class GameListFragment extends Fragment implements ListAdapter {
 				0,
 				1));
 		gameListView.setAdapter(this);
+		gameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				GameCollection.GameDetail[] games = GameCollection.getInstance().getListOfGames();
+				if (mOnGameSelectedListener != null)
+					mOnGameSelectedListener.onGameSelected(games[i].name);
+			}
+		});
 
 		GameCollection.getInstance().setOnGameCollectionChangedListener(new GameCollection.OnGameCollectionChangedListener() {
 			@Override
@@ -139,4 +148,18 @@ public class GameListFragment extends Fragment implements ListAdapter {
 	public OnNewGameButtonClickedListener getOnNewGameButtonClickedListener() {
 		return mOnNewGameButtonClickedListener;
 	}
+
+	// Game selected from list
+
+	public interface OnGameSelectedListener {
+		public void onGameSelected(String date);
+	}
+	private OnGameSelectedListener mOnGameSelectedListener = null;
+	public OnGameSelectedListener getOnGameSelectedListener() {
+		return mOnGameSelectedListener;
+	}
+	public void setOnGameSelectedListener(OnGameSelectedListener onGameSelectedListener) {
+		mOnGameSelectedListener = onGameSelectedListener;
+	}
+
 }

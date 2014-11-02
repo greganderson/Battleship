@@ -1,5 +1,7 @@
 package com.familybiz.greg.battleship;
 
+import com.familybiz.greg.battleship.utils.DateParser;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,16 +26,68 @@ public class GameCollection {
 		mGames = new ArrayList<Game>();
 	}
 
-	public void addGame(String[][] player1Cells,
-	                    String[][] player2Cells,
-	                    String[][] player1Shots,
-	                    String[][] player2Shots,
-	                    boolean isPlayer1Turn,
-	                    boolean isDone,
-	                    Date timeStarted) {
-		mGames.add(new Game(player1Cells, player2Cells, player1Shots, player2Shots, isPlayer1Turn, isDone, timeStarted));
+	public void saveGame(String[][] player1Cells,
+	                     String[][] player2Cells,
+	                     String[][] player1Shots,
+	                     String[][] player2Shots,
+	                     boolean isPlayer1Turn,
+	                     boolean isDone,
+	                     Date timeStarted) {
+
+		// Check if game already exists, then update it if it does.  Create a new one if it does not.
+		if (gameExists(timeStarted))
+			updateGame(player1Cells, player2Cells, player1Shots, player2Shots, isPlayer1Turn, isDone, timeStarted);
+		else
+			mGames.add(new Game(player1Cells, player2Cells, player1Shots, player2Shots, isPlayer1Turn, isDone, timeStarted));
+
 		if (mOnGameCollectionChangedListener != null)
 			mOnGameCollectionChangedListener.onGameCollectionChanged();
+	}
+
+	/**
+	 * Updates an existing game with the new information.
+	 */
+	private void updateGame(
+			String[][] player1Cells,
+			String[][] player2Cells,
+			String[][] player1Shots,
+			String[][] player2Shots,
+			boolean isPlayer1Turn,
+			boolean isDone,
+			Date timeStarted) {
+		Game game = null;
+		for (Game g : mGames) {
+			if (g.timeStarted.compareTo(timeStarted) == 0) {
+				game = g;
+				break;
+			}
+		}
+		game.player1Cells = player1Cells;
+		game.player2Cells = player2Cells;
+		game.player1Shots = player1Shots;
+		game.player2Shots = player2Shots;
+		game.isPlayer1Turn = isPlayer1Turn;
+		game.isDone = isDone;
+	}
+
+	/**
+	 * Returns true if the game with the given date already exists.
+	 */
+	private boolean gameExists(Date date) {
+		for (Game game : mGames)
+			if (game.timeStarted.compareTo(date) == 0)
+				return true;
+		return false;
+	}
+
+	/**
+	 * Returns a copy of the asked for game.
+	 */
+	public Game getGame(Date date) {
+		for (Game game : mGames)
+			if (game.timeStarted.toString().equals(date.toString()))
+				return new Game(game);
+		return null;
 	}
 
 	/**
@@ -43,7 +97,7 @@ public class GameCollection {
 		GameDetail[] result = new GameDetail[mGames.size()];
 		for (int i = 0; i < mGames.size(); i++)
 			result[i] = new GameDetail(
-					convertDateToString(mGames.get(i).timeStarted),
+					DateParser.convertDateToString(mGames.get(i).timeStarted),
 					mGames.get(i).isDone);
 
 		// Alphabetize!!
@@ -57,19 +111,11 @@ public class GameCollection {
 		return result;
 	}
 
-	/**
-	 * Changes the string format of a string to be smaller and hopefully easier to read.
-	 */
-	private String convertDateToString(Date date) {
-		String sDate = date.toString();
-		return sDate.substring(sDate.indexOf(' '), sDate.length()-9);
-	}
-
 
 	/**
 	 * Contains all the information needed for a game.
 	 */
-	private class Game {
+	public class Game {
 		public String[][] player1Cells;
 		public String[][] player2Cells;
 		public String[][] player1Shots;
@@ -92,6 +138,16 @@ public class GameCollection {
 			this.isPlayer1Turn = isPlayer1Turn;
 			this.isDone = isDone;
 			this.timeStarted = timeStarted;
+		}
+
+		public Game(Game game) {
+			this.player1Cells = game.player1Cells;
+			this.player2Cells = game.player2Cells;
+			this.player1Shots = game.player1Shots;
+			this.player2Shots = game.player2Shots;
+			this.isPlayer1Turn = game.isPlayer1Turn;
+			this.isDone = game.isDone;
+			this.timeStarted = game.timeStarted;
 		}
 	}
 
