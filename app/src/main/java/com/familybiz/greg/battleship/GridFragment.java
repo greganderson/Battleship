@@ -231,6 +231,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 		mTimeStarted = game.timeStarted;
 		mInProgress  = game.isDone;
+		mTurnPlayer1 = game.isPlayer1Turn;
 
 		// Set the title to reflect who's turn it is
 		getActivity().setTitle(game.isPlayer1Turn ? "Player 1" : "Player 2");
