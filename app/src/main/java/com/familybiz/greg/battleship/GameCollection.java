@@ -2,11 +2,18 @@ package com.familybiz.greg.battleship;
 
 import com.familybiz.greg.battleship.utils.DateParser;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -33,6 +40,17 @@ public class GameCollection {
 		mGames = new ArrayList<Game>();
 	}
 
+	public void saveGame(Game game) {
+		saveGame(
+				game.player1Cells,
+				game.player2Cells,
+				game.player1Shots,
+				game.player2Shots,
+				game.isPlayer1Turn,
+				game.isDone,
+				game.timeStarted);
+	}
+
 	public void saveGame(String[][] player1Cells,
 	                     String[][] player2Cells,
 	                     String[][] player1Shots,
@@ -50,8 +68,6 @@ public class GameCollection {
 		if (mOnGameCollectionChangedListener != null)
 			mOnGameCollectionChangedListener.onGameCollectionChanged();
 
-		GameCollection.Game[] games = GameCollection.getInstance().getAllGames();
-
 		writeToFile();
 	}
 
@@ -66,7 +82,6 @@ public class GameCollection {
 		try {
 			Gson gson = new Gson();
 
-			//String jsonGameList = gson.toJson(mGames.toArray(new Game[mGames.size()]));
 			String jsonGameList = gson.toJson(mGames);
 
 			String result = "{\"" + SAVED_GAMES_LIST + "\":" + jsonGameList + "}";
@@ -78,6 +93,39 @@ public class GameCollection {
 			bufferedWriter.write(result);
 
 			bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Load all games from a saved file if it exists.
+	 */
+	public void loadGames() {
+		try {
+			File file = new File(MainActivity.SAVED_GAMES_FILEPATH, mFilename);
+			FileReader reader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			String content = "";
+			String input = "";
+			while ((input = bufferedReader.readLine()) != null)
+				content += input;
+
+			Gson gson = new Gson();
+
+			JsonParser parser = new JsonParser();
+			JsonObject data = parser.parse(content).getAsJsonObject();
+
+			Type gameListType = new TypeToken<Game[]>(){}.getType();
+			Game[] games = gson.fromJson(data.get(SAVED_GAMES_LIST), gameListType);
+
+			for (Game game : games) saveGame(game);
+
+			bufferedReader.close();
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -97,7 +145,7 @@ public class GameCollection {
 			Date timeStarted) {
 		Game game = null;
 		for (Game g : mGames) {
-			if (g.timeStarted.compareTo(timeStarted) == 0) {
+			if (g.timeStarted.toString().equals(timeStarted.toString())) {
 				game = g;
 				break;
 			}
@@ -115,7 +163,7 @@ public class GameCollection {
 	 */
 	private boolean gameExists(Date date) {
 		for (Game game : mGames)
-			if (game.timeStarted.compareTo(date) == 0)
+			if (game.timeStarted.toString().equals(date.toString()))
 				return true;
 		return false;
 	}

@@ -88,4 +88,10 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 		GameCollection.Game game = GameCollection.getInstance().getGame(DateParser.stringToDate(date));
 		mGridFragment.loadGame(game);
 	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		GameCollection.getInstance().loadGames();
+	}
 }
