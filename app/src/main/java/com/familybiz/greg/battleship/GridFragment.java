@@ -215,6 +215,10 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	public void saveAndClose() {
 		clearListeners();
+		saveCurrentGame();
+	}
+
+	private void saveCurrentGame() {
 		GameCollection.getInstance().saveGame(
 				mPlayer1.getShipCells(),
 				mPlayer2.getShipCells(),
@@ -293,6 +297,12 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		nextTurn();
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		saveCurrentGame();
+		GameCollection.getInstance().saveAllGames();
+	}
 
 	/****************** LISTENERS ******************/
 

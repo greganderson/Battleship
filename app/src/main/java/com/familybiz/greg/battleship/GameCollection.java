@@ -1,7 +1,12 @@
 package com.familybiz.greg.battleship;
 
 import com.familybiz.greg.battleship.utils.DateParser;
+import com.google.gson.Gson;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,6 +18,8 @@ import java.util.Date;
 public class GameCollection {
 
 	private static GameCollection mInstance = null;
+	private static final String mFilename = "games.txt";
+	private static final String SAVED_GAMES_LIST = "savedGames";
 
 	public static synchronized GameCollection getInstance() {
 		if (mInstance == null)
@@ -42,6 +49,39 @@ public class GameCollection {
 
 		if (mOnGameCollectionChangedListener != null)
 			mOnGameCollectionChangedListener.onGameCollectionChanged();
+
+		GameCollection.Game[] games = GameCollection.getInstance().getAllGames();
+
+		writeToFile();
+	}
+
+	public void saveAllGames() {
+		writeToFile();
+	}
+
+	/**
+	 * Saves all of the existing games to device.
+	 */
+	private void writeToFile() {
+		try {
+			Gson gson = new Gson();
+
+			//String jsonGameList = gson.toJson(mGames.toArray(new Game[mGames.size()]));
+			String jsonGameList = gson.toJson(mGames);
+
+			String result = "{\"" + SAVED_GAMES_LIST + "\":" + jsonGameList + "}";
+
+			File file = new File(MainActivity.SAVED_GAMES_FILEPATH, mFilename);
+			FileWriter writer = new FileWriter(file);
+			BufferedWriter bufferedWriter = new BufferedWriter(writer);
+
+			bufferedWriter.write(result);
+
+			bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -109,6 +149,13 @@ public class GameCollection {
 		});
 
 		return result;
+	}
+
+	/**
+	 * Returns a full list of existing games with all of their information.
+	 */
+	public Game[] getAllGames() {
+		return mGames.toArray(new Game[mGames.size()]);
 	}
 
 

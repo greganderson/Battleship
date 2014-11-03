@@ -10,10 +10,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.familybiz.greg.battleship.utils.DateParser;
+import com.google.gson.Gson;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 
 /**
@@ -23,10 +25,13 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 
 	GridFragment mGridFragment;
 	GameListFragment mGameListFragment;
+	public static File SAVED_GAMES_FILEPATH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+		SAVED_GAMES_FILEPATH = getFilesDir();
 
 	    LinearLayout rootLayout = new LinearLayout(this);
 	    rootLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -65,6 +70,7 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 	public void onChangeTurn(boolean inProgress) {
 		mGameListFragment.setNewGameButtonStatus(!inProgress);
 	}
+
 	@Override
 	public void onNewGameButtonClicked() {
 		mGridFragment.saveAndClose();
