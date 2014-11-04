@@ -100,7 +100,7 @@ public class Player {
 
 
 		if (mOnPlayerGridChangedListener != null)
-			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[y][x].cellType.equals(SHIP));
+			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[y][x].cellType.equals(HIT));
 
 		if (numberOfHits == numberOfShipCells)
 			if (mOnAllShipsDestroyedListener != null)

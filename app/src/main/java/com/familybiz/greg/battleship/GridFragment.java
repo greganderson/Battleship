@@ -200,7 +200,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	public void onAllShipsDestroyed() {
 		mInProgress = false;
 		clearListeners();
-		Toast.makeText(getActivity(), "Player " + (GameCollection.isPlayer1Turn ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), "Player " + (!GameCollection.isPlayer1Turn ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
 	}
 
 	private class GameTimer extends TimerTask {
@@ -209,6 +209,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 			Intent intent = new Intent();
 			intent.putExtra(PLAYER_TURN, GameCollection.isPlayer1Turn);
 			intent.setClass(getActivity(), TransitionActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivityForResult(intent, 1);
 		}
 	}
