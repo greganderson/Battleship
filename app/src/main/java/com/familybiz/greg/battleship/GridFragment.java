@@ -138,7 +138,6 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		for (int i = 0; i < view.getChildCount(); i++) {
 			int x = i % Player.GRID_WIDTH;
 			int y = i / Player.GRID_HEIGHT;
-			CellView cell = (CellView)view.getChildAt(i);
 
 			String cellType = cells[y][x];
 
@@ -155,7 +154,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 			else
 				color = Color.BLACK;
 
-			cell.setBackgroundColor(color);
+			view.setCellColor(x, y, color);
 		}
 	}
 

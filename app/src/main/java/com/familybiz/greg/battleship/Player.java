@@ -34,7 +34,7 @@ public class Player {
 		// Set the number of hits
 		for (int y = 0; y < GRID_HEIGHT; y++)
 			for (int x = 0; x < GRID_WIDTH; x++)
-				if (this.opponentCells[y][x].isShot)
+				if(this.opponentCells[y][x].cellType.equals(HIT) || this.opponentCells[y][x].cellType.equals(MISS))
 					numberOfHits++;
 	}
 
@@ -58,12 +58,9 @@ public class Player {
 	}
 
 	private void setCells(String[][] srcCells, Cell[][] destCells) {
-		for (int y = 0; y < GRID_HEIGHT; y++) {
-			for (int x = 0; x < GRID_WIDTH; x++) {
+		for (int y = 0; y < GRID_HEIGHT; y++)
+			for (int x = 0; x < GRID_WIDTH; x++)
 				destCells[y][x].cellType = srcCells[y][x];
-				destCells[y][x].isShot = srcCells[y][x].equals(HIT);
-			}
-		}
 	}
 
 	/**
@@ -91,12 +88,16 @@ public class Player {
 	 */
 	public boolean opponentShotMissile(int x, int y) {
 		// Check if cell has already been shot at
-		if (playerCells[y][x].isShot)
+		boolean invalidShot = playerCells[y][x].cellType.equals(HIT) || playerCells[y][x].cellType.equals(MISS);
+		if (invalidShot)
 			return false;
-		if (playerCells[y][x].cellType.equals(SHIP))
+		if (playerCells[y][x].cellType.equals(SHIP)) {
+			playerCells[y][x].cellType = HIT;
 			numberOfHits++;
+		}
+		else
+			playerCells[y][x].cellType = MISS;
 
-		playerCells[y][x].isShot = true;
 
 		if (mOnPlayerGridChangedListener != null)
 			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[y][x].cellType.equals(SHIP));
@@ -112,7 +113,6 @@ public class Player {
 	 * Changes the opponent's grid according to the missile fired.
 	 */
 	public void playerShotMissile(int x, int y, boolean hit) {
-		opponentCells[y][x].isShot = true;
 		opponentCells[y][x].cellType = hit ? HIT : MISS;
 	}
 
@@ -201,7 +201,6 @@ public class Player {
 	 */
 	public class Cell {
 		public String cellType = WATER;     // Either water or a ship
-		public boolean isShot = false;      // True if the cell has already been shot at
 	}
 
 
