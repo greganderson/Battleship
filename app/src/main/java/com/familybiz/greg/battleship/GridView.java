@@ -16,7 +16,7 @@ public class GridView extends ViewGroup {
 	public static final int CELL_COLOR_MISS = Color.WHITE;
 	public static final int CELL_COLOR_HIT = Color.RED;
 
-    public static CellView[][] mCells = new CellView[Player.GRID_HEIGHT][Player.GRID_WIDTH];
+    private CellView[][] mCells = new CellView[Player.GRID_HEIGHT][Player.GRID_WIDTH];
 
     public GridView(Context context) {
         super(context);
@@ -24,6 +24,10 @@ public class GridView extends ViewGroup {
 
 	public void setCellColor(int x, int y, int color) {
 		mCells[y][x].setBackgroundColor(color);
+	}
+
+	public void addCell(int x, int y, CellView cell) {
+		mCells[y][x] = cell;
 	}
 
     @Override

@@ -26,8 +26,6 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	private boolean mTurnPlayer1 = true;
 
-	private LinearLayout mRootLayout;
-
 	private GridView mPlayer1PlayerGrid;
 	private GridView mPlayer2PlayerGrid;
 	private GridView mPlayer1OpponentGrid;
@@ -45,8 +43,8 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 		getActivity().setTitle("Player 1");
 
-		mRootLayout = new LinearLayout(getActivity());
-		mRootLayout.setOrientation(LinearLayout.HORIZONTAL);
+		LinearLayout rootLayout = new LinearLayout(getActivity());
+		rootLayout.setOrientation(LinearLayout.HORIZONTAL);
 
 		mPlayer1PlayerGrid = new GridView(getActivity());
 		mPlayer1PlayerGrid.setVisibility(View.VISIBLE);
@@ -81,13 +79,13 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 		initializePlayerShipCells(mPlayer2PlayerGrid, shipCellsPlayer2);
 		initializeOpenWaterCells(mPlayer2OpponentGrid, false);
 
-		mRootLayout.addView(mPlayer1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-		mRootLayout.addView(mPlayer1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		rootLayout.addView(mPlayer1PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		rootLayout.addView(mPlayer1OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 
-		mRootLayout.addView(mPlayer2PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-		mRootLayout.addView(mPlayer2OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		rootLayout.addView(mPlayer2PlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		rootLayout.addView(mPlayer2OpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 
-		return mRootLayout;
+		return rootLayout;
 	}
 
 	private void initializePlayerShipCells(GridView view, String[][] cells) {
@@ -98,6 +96,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 				// Set color of cell to gray if a ship, blue otherwise
 				c.setBackgroundColor(cells[y][x].equals(Player.SHIP) ? GridView.CELL_COLOR_SHIP : GridView.CELL_COLOR_WATER);
 
+				view.addCell(x, y, c);
 				view.addView(c);
 			}
 		}
@@ -128,6 +127,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 					});
 				}
 
+				view.addCell(x, y, c);
 				view.addView(c);
 			}
 		}
@@ -181,13 +181,16 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 	@Override
 	public void onPlayerGridChanged(int x, int y, boolean isHit) {
+		int color = isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS;
 		if (mTurnPlayer1) {
 			mPlayer1.playerShotMissile(x, y, isHit);
-			mPlayer1OpponentGrid.setCellColor(x, y, isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS);
+			mPlayer1OpponentGrid.setCellColor(x, y, color);
+			mPlayer2PlayerGrid.setCellColor(x, y, color);
 		}
 		else {
 			mPlayer2.playerShotMissile(x, y, isHit);
-			mPlayer2OpponentGrid.setCellColor(x, y, isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS);
+			mPlayer2OpponentGrid.setCellColor(x, y, color);
+			mPlayer1PlayerGrid.setCellColor(x, y, color);
 		}
 		Toast.makeText(getActivity(), isHit ? "Hit!" : "Miss", Toast.LENGTH_SHORT).show();
 
