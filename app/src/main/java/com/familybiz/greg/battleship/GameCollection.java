@@ -27,6 +27,7 @@ public class GameCollection {
 	private static GameCollection mInstance = null;
 	private static final String mFilename = "games.txt";
 	private static final String SAVED_GAMES_LIST = "savedGames";
+	public static boolean isPlayer1Turn;
 
 	public static synchronized GameCollection getInstance() {
 		if (mInstance == null)
@@ -38,6 +39,7 @@ public class GameCollection {
 
 	private GameCollection() {
 		mGames = new ArrayList<Game>();
+		isPlayer1Turn = true;
 	}
 
 	public void saveGame(Game game) {
@@ -199,13 +201,6 @@ public class GameCollection {
 		return result;
 	}
 
-	/**
-	 * Returns a full list of existing games with all of their information.
-	 */
-	public Game[] getAllGames() {
-		return mGames.toArray(new Game[mGames.size()]);
-	}
-
 
 	/**
 	 * Contains all the information needed for a game.
@@ -270,5 +265,4 @@ public class GameCollection {
 	public void setOnGameCollectionChangedListener(OnGameCollectionChangedListener onGameCollectionChangedListener) {
 		mOnGameCollectionChangedListener = onGameCollectionChangedListener;
 	}
-
 }

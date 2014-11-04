@@ -24,8 +24,6 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	private Player mPlayer1;
 	private Player mPlayer2;
 
-	private boolean mTurnPlayer1 = true;
-
 	private GridView mPlayer1PlayerGrid;
 	private GridView mPlayer2PlayerGrid;
 	private GridView mPlayer1OpponentGrid;
@@ -162,32 +160,32 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	}
 
 	private void nextTurn() {
-		if (mTurnPlayer1) {
-			mTurnPlayer1 = false;
-			mPlayer1PlayerGrid.setVisibility(View.GONE);
-			mPlayer1OpponentGrid.setVisibility(View.GONE);
-			mPlayer2PlayerGrid.setVisibility(View.VISIBLE);
-			mPlayer2OpponentGrid.setVisibility(View.VISIBLE);
-		}
-		else {
-			mTurnPlayer1 = true;
+		if (GameCollection.isPlayer1Turn) {
 			mPlayer1PlayerGrid.setVisibility(View.VISIBLE);
 			mPlayer1OpponentGrid.setVisibility(View.VISIBLE);
 			mPlayer2PlayerGrid.setVisibility(View.GONE);
 			mPlayer2OpponentGrid.setVisibility(View.GONE);
 		}
-		getActivity().setTitle("Player " + (mTurnPlayer1 ? 1 : 2));
+		else {
+			mPlayer1PlayerGrid.setVisibility(View.GONE);
+			mPlayer1OpponentGrid.setVisibility(View.GONE);
+			mPlayer2PlayerGrid.setVisibility(View.VISIBLE);
+			mPlayer2OpponentGrid.setVisibility(View.VISIBLE);
+		}
+		getActivity().setTitle("Player " + (GameCollection.isPlayer1Turn ? 1 : 2));
 	}
 
 	@Override
 	public void onPlayerGridChanged(int x, int y, boolean isHit) {
 		int color = isHit ? GridView.CELL_COLOR_HIT : GridView.CELL_COLOR_MISS;
-		if (mTurnPlayer1) {
+		if (GameCollection.isPlayer1Turn) {
+			GameCollection.isPlayer1Turn = !GameCollection.isPlayer1Turn;
 			mPlayer1.playerShotMissile(x, y, isHit);
 			mPlayer1OpponentGrid.setCellColor(x, y, color);
 			mPlayer2PlayerGrid.setCellColor(x, y, color);
 		}
 		else {
+			GameCollection.isPlayer1Turn = !GameCollection.isPlayer1Turn;
 			mPlayer2.playerShotMissile(x, y, isHit);
 			mPlayer2OpponentGrid.setCellColor(x, y, color);
 			mPlayer1PlayerGrid.setCellColor(x, y, color);
@@ -203,14 +201,14 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	public void onAllShipsDestroyed() {
 		mInProgress = false;
 		clearListeners();
-		Toast.makeText(getActivity(), "Player " + (mTurnPlayer1 ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), "Player " + (GameCollection.isPlayer1Turn ? 1 : 2) + " wins!", Toast.LENGTH_SHORT).show();
 	}
 
 	private class GameTimer extends TimerTask {
 		@Override
 		public void run() {
 			Intent intent = new Intent();
-			intent.putExtra(PLAYER_TURN, !mTurnPlayer1);
+			intent.putExtra(PLAYER_TURN, GameCollection.isPlayer1Turn);
 			intent.setClass(getActivity(), TransitionActivity.class);
 			startActivityForResult(intent, 1);
 		}
@@ -227,7 +225,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 				mPlayer2.getShipCells(),
 				mPlayer1.getOpponentCells(),
 				mPlayer2.getOpponentCells(),
-				mTurnPlayer1,
+				GameCollection.isPlayer1Turn,
 				mInProgress,
 				mTimeStarted);
 	}
@@ -238,7 +236,7 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 
 		mTimeStarted = game.timeStarted;
 		mInProgress  = game.isDone;
-		mTurnPlayer1 = game.isPlayer1Turn;
+		GameCollection.isPlayer1Turn = game.isPlayer1Turn;
 
 		// Set the title to reflect who's turn it is
 		getActivity().setTitle(game.isPlayer1Turn ? "Player 1" : "Player 2");
