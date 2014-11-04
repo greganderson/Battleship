@@ -2,20 +2,17 @@ package com.familybiz.greg.battleship;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.familybiz.greg.battleship.utils.DateParser;
-import com.google.gson.Gson;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 
 /**
@@ -25,6 +22,8 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 
 	GridFragment mGridFragment;
 	GameListFragment mGameListFragment;
+	FrameLayout mGameListView;
+	FrameLayout mGameView;
 	public static File SAVED_GAMES_FILEPATH;
 
     @Override
@@ -37,21 +36,13 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 	    rootLayout.setOrientation(LinearLayout.HORIZONTAL);
         setContentView(rootLayout);
 
-	    FrameLayout gameListView = new FrameLayout(this);
-	    gameListView.setId(10);
-	    gameListView.setBackgroundColor(Color.DKGRAY);
-	    rootLayout.addView(gameListView, new LinearLayout.LayoutParams(
-			    0,
-			    ViewGroup.LayoutParams.MATCH_PARENT,
-			    20));
+	    mGameListView = new FrameLayout(this);
+	    mGameListView.setId(10);
+	    mGameListView.setBackgroundColor(Color.DKGRAY);
 
-	    FrameLayout gameView = new FrameLayout(this);
-	    gameView.setId(11);
-	    gameView.setBackgroundColor(Color.BLACK);
-	    rootLayout.addView(gameView, new LinearLayout.LayoutParams(
-			    0,
-			    ViewGroup.LayoutParams.MATCH_PARENT,
-			    80));
+	    mGameView = new FrameLayout(this);
+	    mGameView.setId(11);
+	    mGameView.setBackgroundColor(Color.BLACK);
 
 	    mGameListFragment = new GameListFragment();
 	    mGridFragment = new GridFragment();
@@ -60,15 +51,52 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 	    mGameListFragment.setOnNewGameButtonClickedListener(this);
 	    mGameListFragment.setOnGameSelectedListener(this);
 
+
+	    // Lay them out!
+	    if (isTabletDevice(getResources())) {
+		    // Game list view
+		    rootLayout.addView(mGameListView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 20));
+		    // Grid area
+		    rootLayout.addView(mGameView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 80));
+	    }
+	    else {
+		    // Game list view
+		    rootLayout.addView(mGameListView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 0));
+		    // Grid area
+		    rootLayout.addView(mGameView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+	    }
+
 	    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
 	    addTransaction.add(10, mGameListFragment);
 	    addTransaction.add(11, mGridFragment);
 	    addTransaction.commit();
     }
 
+	private boolean isTabletDevice(Resources resources) {
+		int screenLayout = resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+		boolean isScreenLarge = (screenLayout == Configuration.SCREENLAYOUT_SIZE_LARGE);
+		boolean isScreenXlarge = (screenLayout == Configuration.SCREENLAYOUT_SIZE_XLARGE);
+		return (isScreenLarge || isScreenXlarge);
+	}
+
+	@Override
+	public void onBackPressed() {
+		LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+		LinearLayout.LayoutParams gridParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0);
+		mGameListView.setLayoutParams(listParams);
+		mGameView.setLayoutParams(gridParams);
+	}
+
 	@Override
 	public void onChangeTurn(boolean inProgress) {
 		mGameListFragment.setNewGameButtonStatus(!inProgress);
+	}
+
+	private void setScreenToGrids() {
+		LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0);
+		LinearLayout.LayoutParams gridParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+		mGameListView.setLayoutParams(listParams);
+		mGameView.setLayoutParams(gridParams);
 	}
 
 	@Override
@@ -81,12 +109,14 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 		mGridFragment = new GridFragment();
 		mGridFragment.setOnChangeTurnListener(MainActivity.this);
 		addTransaction.add(11, mGridFragment).commit();
+		setScreenToGrids();
 	}
 
 	@Override
 	public void onGameSelected(String date) {
 		GameCollection.Game game = GameCollection.getInstance().getGame(DateParser.stringToDate(date));
 		mGridFragment.loadGame(game);
+		setScreenToGrids();
 	}
 
 	@Override
