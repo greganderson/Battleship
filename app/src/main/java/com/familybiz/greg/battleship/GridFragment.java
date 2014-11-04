@@ -314,7 +314,4 @@ public class GridFragment extends Fragment implements Player.OnPlayerGridChanged
 	public void setOnChangeTurnListener(OnChangeTurnListener onChangeTurnListener) {
 		mOnChangeTurnListener = onChangeTurnListener;
 	}
-	public OnChangeTurnListener getOnChangeTurnListener() {
-		return mOnChangeTurnListener;
-	}
 }

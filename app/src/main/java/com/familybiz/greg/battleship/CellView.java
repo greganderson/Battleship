@@ -42,7 +42,4 @@ public class CellView extends View {
 	public void setOnCellTouchedListener(OnCellTouchedListener onCellTouchedListener) {
 		mOnCellTouchedListener = onCellTouchedListener;
 	}
-	public OnCellTouchedListener getOnCellTouchedListener() {
-		return mOnCellTouchedListener;
-	}
 }

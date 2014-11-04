@@ -216,9 +216,6 @@ public class Player {
 	public void setOnPlayerGridChangedListener(OnPlayerGridChangedListener onPlayerGridChangedListener) {
 		mOnPlayerGridChangedListener = onPlayerGridChangedListener;
 	}
-	public OnPlayerGridChangedListener getPlayerOnGridChangedListener() {
-		return mOnPlayerGridChangedListener;
-	}
 
 	// All ships have been destroyed
 	public interface OnAllShipsDestroyedListener {
@@ -227,8 +224,5 @@ public class Player {
 	private OnAllShipsDestroyedListener mOnAllShipsDestroyedListener = null;
 	public void setOnAllShipsDestroyedListener(OnAllShipsDestroyedListener onAllShipsDestroyedListener) {
 		mOnAllShipsDestroyedListener = onAllShipsDestroyedListener;
-	}
-	public OnAllShipsDestroyedListener getOnAllShipsDestroyedListener() {
-		return mOnAllShipsDestroyedListener;
 	}
 }

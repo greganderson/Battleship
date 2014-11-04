@@ -145,9 +145,6 @@ public class GameListFragment extends Fragment implements ListAdapter {
 	public void setOnNewGameButtonClickedListener(OnNewGameButtonClickedListener onNewGameButtonClickedListener) {
 		mOnNewGameButtonClickedListener = onNewGameButtonClickedListener;
 	}
-	public OnNewGameButtonClickedListener getOnNewGameButtonClickedListener() {
-		return mOnNewGameButtonClickedListener;
-	}
 
 	// Game selected from list
 
@@ -155,9 +152,6 @@ public class GameListFragment extends Fragment implements ListAdapter {
 		public void onGameSelected(String date);
 	}
 	private OnGameSelectedListener mOnGameSelectedListener = null;
-	public OnGameSelectedListener getOnGameSelectedListener() {
-		return mOnGameSelectedListener;
-	}
 	public void setOnGameSelectedListener(OnGameSelectedListener onGameSelectedListener) {
 		mOnGameSelectedListener = onGameSelectedListener;
 	}

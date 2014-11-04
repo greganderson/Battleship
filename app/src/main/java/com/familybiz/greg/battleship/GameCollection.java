@@ -270,8 +270,5 @@ public class GameCollection {
 	public void setOnGameCollectionChangedListener(OnGameCollectionChangedListener onGameCollectionChangedListener) {
 		mOnGameCollectionChangedListener = onGameCollectionChangedListener;
 	}
-	public OnGameCollectionChangedListener getOnGameCollectionChangedListener() {
-		return mOnGameCollectionChangedListener;
-	}
 
 }

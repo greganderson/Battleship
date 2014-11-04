@@ -31,9 +31,5 @@ public class DateParser {
 	 */
 	public static String convertDateToString(Date date) {
 		return date.toString();
-		/*
-		String sDate = date.toString();
-		return sDate.substring(sDate.indexOf(' ')+1, sDate.length()-9);
-		*/
 	}
 }
