@@ -1,6 +1,7 @@
 package com.familybiz.greg.battleship;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -14,10 +15,17 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.familybiz.greg.battleship.network.PostObjects.CreateGame;
+import com.familybiz.greg.battleship.network.requestObjects.GameData;
+import com.familybiz.greg.battleship.network.requestObjects.PlayerData;
+
 /**
  * Created by Greg Anderson
  */
-public class GameListFragment extends Fragment implements ListAdapter {
+public class GameListFragment extends Fragment implements ListAdapter, CreateGame.OnCreateGameListener {
+
+	public final int GAME_SUCCESSFULLY_CREATED = 1;
+	public final int GAME_CREATION_CANCELLED = 2;
 
 	private Button mNewGameButton;
 
@@ -60,13 +68,22 @@ public class GameListFragment extends Fragment implements ListAdapter {
 		mNewGameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (mOnNewGameButtonClickedListener != null)
-					mOnNewGameButtonClickedListener.onNewGameButtonClicked();
+				Intent createGameIntent = new Intent();
+				startActivityForResult(createGameIntent, 0);
 			}
 		});
 
 
 		return rootLayout;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == GAME_SUCCESSFULLY_CREATED)
+			if (mOnNewGameButtonClickedListener != null)
+				mOnNewGameButtonClickedListener.onNewGameButtonClicked();
 	}
 
 	public void setNewGameButtonStatus(boolean enabled) {
@@ -131,6 +148,11 @@ public class GameListFragment extends Fragment implements ListAdapter {
 
 	@Override
 	public void unregisterDataSetObserver(DataSetObserver dataSetObserver) { }
+
+	@Override
+	public void onCreateGame(GameData gameData, PlayerData playerData) {
+		// TODO: Store the data for the player to use
+	}
 
 
 	/****************** LISTENERS ******************/

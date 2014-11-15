@@ -58,8 +58,8 @@ public class PlayerBoard {
 
 		BoardData playerBoardData = new BoardData();
 		BoardData opponentBoardData = new BoardData();
-		playerBoardData.cells = new BoardData.Cell[10][10];
-		opponentBoardData.cells = new BoardData.Cell[10][10];
+		playerBoardData.cells = new BoardData.CellData[10][10];
+		opponentBoardData.cells = new BoardData.CellData[10][10];
 
 		for (int boardIndex = 0; boardIndex < 2; boardIndex++) {
 			ResultBoard.ResultCell[] resultCells = boardResult[boardIndex].resultCells;

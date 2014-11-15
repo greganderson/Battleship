@@ -1,7 +1,5 @@
 package com.familybiz.greg.battleship;
 
-import java.util.Random;
-
 /**
  * Created by Greg Anderson
  */
@@ -22,7 +20,6 @@ public class Player {
 
 	public Player() {
 		initializeCells();
-		initializeShips();
 	}
 
 	public Player(String[][] shipCells, String[][] opponentCells) {
@@ -98,14 +95,6 @@ public class Player {
 		else
 			playerCells[y][x].cellType = MISS;
 
-
-		if (mOnPlayerGridChangedListener != null)
-			mOnPlayerGridChangedListener.onPlayerGridChanged(x, y, playerCells[y][x].cellType.equals(HIT));
-
-		if (numberOfHits == numberOfShipCells)
-			if (mOnAllShipsDestroyedListener != null)
-				mOnAllShipsDestroyedListener.onAllShipsDestroyed();
-
 		return true;
 	}
 
@@ -117,111 +106,10 @@ public class Player {
 	}
 
 	/**
-	 * Randomly place the ships.
-	 */
-	private void initializeShips() {
-		Random rand = new Random();
-
-		// Set up ship lengths
-		int[] shipSizes = {2, 3, 3, 4, 5};
-
-		for (int shipSize : shipSizes) {
-			boolean shipComplete = false;
-			while (!shipComplete) {
-				shipComplete = true;
-
-				// Pick random cell location
-				int randomX = rand.nextInt(GRID_WIDTH);
-				int randomY = rand.nextInt(GRID_HEIGHT);
-
-				// Pick which direction to try putting the ship
-				boolean tryRight = rand.nextBoolean();
-
-				// Attempt to place the ship
-				for (int i = 0; i < shipSize; i++) {
-					Cell currentCell;
-
-					// Catch index out of bounds exception to try a different location
-					try {
-						// Pick the cell in the specified direction
-						if (tryRight)
-							currentCell = playerCells[randomY][randomX + i];
-						else
-							currentCell = playerCells[randomY + i][randomX];
-					}
-					catch (ArrayIndexOutOfBoundsException e) {
-						shipComplete = false;
-
-						// Reset the playerCells that got set during this attempt
-						resetShipCells(randomX, randomY, i, tryRight);
-
-						// Start over
-						break;
-					}
-
-					// Check if the current cell already contains part of a ship
-					if (currentCell.cellType.equals(SHIP)) {
-						shipComplete = false;
-
-						// Reset the playerCells that got set during this attempt
-						resetShipCells(randomX, randomY, i, tryRight);
-
-						// Start over
-						break;
-					}
-
-					// Everything good so far, set cell to be part of ship
-					currentCell.cellType = SHIP;
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Helper method for randomizing the ship locations.
-	 */
-	private void resetShipCells(int x, int y, int i, boolean tryRight) {
-		Cell currentCell;
-		// Reset the playerCells that got set during this attempt
-		i--;
-		for (; i >= 0; i--) {
-			if (tryRight)
-				currentCell = playerCells[y][x + i];
-			else
-				currentCell = playerCells[y + i][x];
-			currentCell.cellType = WATER;
-		}
-	}
-
-
-	/**
 	 * Represents one cell on the battleship grid.  Contains the type of cell (cell contains part of
 	 * a ship or cell is water) as well as whether the cell has been shot at.
 	 */
 	public class Cell {
 		public String cellType = WATER;     // Either water or a ship
-	}
-
-
-	/****************** LISTENERS ******************/
-
-
-	// Player's grid
-	public interface OnPlayerGridChangedListener {
-		public void onPlayerGridChanged(int x, int y, boolean isHit);
-	}
-	OnPlayerGridChangedListener mOnPlayerGridChangedListener = null;
-	public void setOnPlayerGridChangedListener(OnPlayerGridChangedListener onPlayerGridChangedListener) {
-		mOnPlayerGridChangedListener = onPlayerGridChangedListener;
-	}
-
-	// All ships have been destroyed
-	public interface OnAllShipsDestroyedListener {
-		public void onAllShipsDestroyed();
-	}
-	private OnAllShipsDestroyedListener mOnAllShipsDestroyedListener = null;
-	public void setOnAllShipsDestroyedListener(OnAllShipsDestroyedListener onAllShipsDestroyedListener) {
-		mOnAllShipsDestroyedListener = onAllShipsDestroyedListener;
 	}
 }

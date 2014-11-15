@@ -30,6 +30,14 @@ public class GridView extends ViewGroup {
 		mCells[y][x] = cell;
 	}
 
+	public CellView getCell(int x, int y) {
+		return mCells[y][x];
+	}
+
+	public int getCellColor(int x, int y) {
+		return mCells[y][x].getSolidColor();
+	}
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int widthSpec = MeasureSpec.getSize(widthMeasureSpec);

@@ -5,13 +5,13 @@ package com.familybiz.greg.battleship.network.requestObjects;
  */
 public class BoardData {
 
-	public Cell[][] cells;
+	public CellData[][] cells;
 
 	public void addCell(int x, int y) {
-		cells[y][x] = new Cell();
+		cells[y][x] = new CellData();
 	}
 
-	public class Cell {
+	public class CellData {
 		public int xPos;
 		public int yPos;
 		public String status;

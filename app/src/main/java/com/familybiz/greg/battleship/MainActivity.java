@@ -18,7 +18,7 @@ import java.io.File;
 /**
  * Created by Greg Anderson
  */
-public class MainActivity extends Activity implements GridFragment.OnChangeTurnListener, GameListFragment.OnNewGameButtonClickedListener, GameListFragment.OnGameSelectedListener {
+public class MainActivity extends Activity implements GameListFragment.OnNewGameButtonClickedListener, GameListFragment.OnGameSelectedListener {
 
 	GridFragment mGridFragment;
 	GameListFragment mGameListFragment;
@@ -46,7 +46,6 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 
 	    mGameListFragment = new GameListFragment();
 	    mGridFragment = new GridFragment();
-	    mGridFragment.setOnChangeTurnListener(this);
 
 	    mGameListFragment.setOnNewGameButtonClickedListener(this);
 	    mGameListFragment.setOnGameSelectedListener(this);
@@ -55,15 +54,27 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 	    // Lay them out!
 	    if (isTabletDevice(getResources())) {
 		    // Game list view
-		    rootLayout.addView(mGameListView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 20));
+		    rootLayout.addView(mGameListView, new LinearLayout.LayoutParams(
+					0,
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					20));
 		    // Grid area
-		    rootLayout.addView(mGameView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 80));
+		    rootLayout.addView(mGameView, new LinearLayout.LayoutParams(
+					0,
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					80));
 	    }
 	    else {
 		    // Game list view
-		    rootLayout.addView(mGameListView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 0));
+		    rootLayout.addView(mGameListView, new LinearLayout.LayoutParams(
+					0,
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					0));
 		    // Grid area
-		    rootLayout.addView(mGameView, new LinearLayout.LayoutParams( 0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		    rootLayout.addView(mGameView, new LinearLayout.LayoutParams(
+					0,
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					1));
 	    }
 
 	    FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
@@ -87,11 +98,6 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 		mGameView.setLayoutParams(gridParams);
 	}
 
-	@Override
-	public void onChangeTurn(boolean inProgress) {
-		mGameListFragment.setNewGameButtonStatus(!inProgress);
-	}
-
 	private void setScreenToGrids() {
 		LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0);
 		LinearLayout.LayoutParams gridParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
@@ -101,13 +107,10 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 
 	@Override
 	public void onNewGameButtonClicked() {
-		mGridFragment.saveAndClose();
-		mGridFragment.setOnChangeTurnListener(null);
 		FragmentTransaction removeTransaction = getFragmentManager().beginTransaction();
 		removeTransaction.remove(mGridFragment).commit();
 		FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
 		mGridFragment = new GridFragment();
-		mGridFragment.setOnChangeTurnListener(MainActivity.this);
 		addTransaction.add(11, mGridFragment).commit();
 		setScreenToGrids();
 	}
@@ -115,7 +118,6 @@ public class MainActivity extends Activity implements GridFragment.OnChangeTurnL
 	@Override
 	public void onGameSelected(String date) {
 		GameCollection.Game game = GameCollection.getInstance().getGame(DateParser.stringToDate(date));
-		mGridFragment.loadGame(game);
 		setScreenToGrids();
 	}
 

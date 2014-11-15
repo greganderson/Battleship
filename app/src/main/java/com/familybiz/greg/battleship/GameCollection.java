@@ -45,27 +45,23 @@ public class GameCollection {
 	public void saveGame(Game game) {
 		saveGame(
 				game.player1Cells,
-				game.player2Cells,
 				game.player1Shots,
-				game.player2Shots,
 				game.isPlayer1Turn,
 				game.isDone,
 				game.timeStarted);
 	}
 
 	public void saveGame(String[][] player1Cells,
-	                     String[][] player2Cells,
 	                     String[][] player1Shots,
-	                     String[][] player2Shots,
 	                     boolean isPlayer1Turn,
 	                     boolean isDone,
 	                     Date timeStarted) {
 
 		// Check if game already exists, then update it if it does.  Create a new one if it does not.
 		if (gameExists(timeStarted))
-			updateGame(player1Cells, player2Cells, player1Shots, player2Shots, isPlayer1Turn, isDone, timeStarted);
+			updateGame(player1Cells, player1Shots, isPlayer1Turn, isDone, timeStarted);
 		else
-			mGames.add(new Game(player1Cells, player2Cells, player1Shots, player2Shots, isPlayer1Turn, isDone, timeStarted));
+			mGames.add(new Game(player1Cells, player1Shots, isPlayer1Turn, isDone, timeStarted));
 
 		if (mOnGameCollectionChangedListener != null)
 			mOnGameCollectionChangedListener.onGameCollectionChanged();
@@ -139,9 +135,7 @@ public class GameCollection {
 	 */
 	private void updateGame(
 			String[][] player1Cells,
-			String[][] player2Cells,
 			String[][] player1Shots,
-			String[][] player2Shots,
 			boolean isPlayer1Turn,
 			boolean isDone,
 			Date timeStarted) {
@@ -153,9 +147,7 @@ public class GameCollection {
 			}
 		}
 		game.player1Cells = player1Cells;
-		game.player2Cells = player2Cells;
 		game.player1Shots = player1Shots;
-		game.player2Shots = player2Shots;
 		game.isPlayer1Turn = isPlayer1Turn;
 		game.isDone = isDone;
 	}
@@ -207,24 +199,18 @@ public class GameCollection {
 	 */
 	public class Game {
 		public String[][] player1Cells;
-		public String[][] player2Cells;
 		public String[][] player1Shots;
-		public String[][] player2Shots;
 		public boolean isPlayer1Turn;
 		public boolean isDone;
 		public Date timeStarted;
 
 		public Game(String[][] player1Cells,
-		            String[][] player2Cells,
 		            String[][] player1Shots,
-		            String[][] player2Shots,
 		            boolean isPlayer1Turn,
 		            boolean isDone,
 		            Date timeStarted) {
 			this.player1Cells = player1Cells;
-			this.player2Cells = player2Cells;
 			this.player1Shots = player1Shots;
-			this.player2Shots = player2Shots;
 			this.isPlayer1Turn = isPlayer1Turn;
 			this.isDone = isDone;
 			this.timeStarted = timeStarted;
@@ -232,9 +218,7 @@ public class GameCollection {
 
 		public Game(Game game) {
 			this.player1Cells = game.player1Cells;
-			this.player2Cells = game.player2Cells;
 			this.player1Shots = game.player1Shots;
-			this.player2Shots = game.player2Shots;
 			this.isPlayer1Turn = game.isPlayer1Turn;
 			this.isDone = game.isDone;
 			this.timeStarted = game.timeStarted;
