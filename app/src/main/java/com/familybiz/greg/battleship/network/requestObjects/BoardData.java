@@ -3,7 +3,7 @@ package com.familybiz.greg.battleship.network.requestObjects;
 /**
  * Created by Greg Anderson
  */
-public class Board {
+public class BoardData {
 
 	public Cell[][] cells;
 

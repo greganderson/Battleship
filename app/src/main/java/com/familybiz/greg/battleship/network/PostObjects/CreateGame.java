@@ -3,8 +3,8 @@ package com.familybiz.greg.battleship.network.PostObjects;
 import android.os.AsyncTask;
 
 import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.Game;
-import com.familybiz.greg.battleship.network.requestObjects.Player;
+import com.familybiz.greg.battleship.network.requestObjects.GameData;
+import com.familybiz.greg.battleship.network.requestObjects.PlayerData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -67,18 +67,18 @@ public class CreateGame {
 		GameCreated newGame = gson.fromJson(result, newGameType);
 
 		// New game
-		Game game = new Game();
-		game.id = newGame.gameId;
-		game.name = gameName;
-		game.status = "WAITING";
+		GameData gameData = new GameData();
+		gameData.id = newGame.gameId;
+		gameData.name = gameName;
+		gameData.status = "WAITING";
 
 		// New player
-		Player player = new Player();
-		player.playerId = newGame.playerId;
-		player.playerName = playerName;
+		PlayerData playerData = new PlayerData();
+		playerData.playerId = newGame.playerId;
+		playerData.playerName = playerName;
 
 		// Trigger listener
-		mOnCreateGameListener.onCreateGame(game, player);
+		mOnCreateGameListener.onCreateGame(gameData, playerData);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class CreateGame {
 	// Joining game
 
 	public interface OnCreateGameListener {
-		public void onCreateGame(Game game, Player player);
+		public void onCreateGame(GameData gameData, PlayerData playerData);
 	}
 	private OnCreateGameListener mOnCreateGameListener;
 	public void setOnCreateGameListener(OnCreateGameListener onCreateGameListener) {

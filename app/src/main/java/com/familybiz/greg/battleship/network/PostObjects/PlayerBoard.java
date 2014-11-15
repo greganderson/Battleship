@@ -3,7 +3,7 @@ package com.familybiz.greg.battleship.network.PostObjects;
 import android.os.AsyncTask;
 
 import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.Board;
+import com.familybiz.greg.battleship.network.requestObjects.BoardData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -56,10 +56,10 @@ public class PlayerBoard {
 		Type boardType = new TypeToken<ResultBoard[]>(){}.getType();
 		ResultBoard[] boardResult = gson.fromJson(result, boardType);
 
-		Board playerBoard = new Board();
-		Board opponentBoard = new Board();
-		playerBoard.cells = new Board.Cell[10][10];
-		opponentBoard.cells = new Board.Cell[10][10];
+		BoardData playerBoardData = new BoardData();
+		BoardData opponentBoardData = new BoardData();
+		playerBoardData.cells = new BoardData.Cell[10][10];
+		opponentBoardData.cells = new BoardData.Cell[10][10];
 
 		for (int boardIndex = 0; boardIndex < 2; boardIndex++) {
 			ResultBoard.ResultCell[] resultCells = boardResult[boardIndex].resultCells;
@@ -68,16 +68,16 @@ public class PlayerBoard {
 					int x = j;
 					int y = i * 10;
 					ResultBoard.ResultCell cell = resultCells[i * 10 + j];
-					playerBoard.addCell(y, x);
-					playerBoard.cells[y][x].xPos = cell.xPos;
-					playerBoard.cells[y][x].yPos = cell.yPos;
-					playerBoard.cells[y][x].status = cell.status;
+					playerBoardData.addCell(y, x);
+					playerBoardData.cells[y][x].xPos = cell.xPos;
+					playerBoardData.cells[y][x].yPos = cell.yPos;
+					playerBoardData.cells[y][x].status = cell.status;
 				}
 			}
 		}
 
 		// Trigger listener
-		mBoardReceivedListener.onBoardReceived(playerBoard, opponentBoard);
+		mBoardReceivedListener.onBoardReceived(playerBoardData, opponentBoardData);
 	}
 
 	private class ResultBoard {
@@ -124,7 +124,7 @@ public class PlayerBoard {
 	// Made guess
 
 	public interface OnBoardReceivedListener {
-		public void onBoardReceived(Board playerBoard, Board opponentBoard);
+		public void onBoardReceived(BoardData playerBoardData, BoardData opponentBoardData);
 	}
 	private OnBoardReceivedListener mBoardReceivedListener;
 	public void setBoardReceivedListener(OnBoardReceivedListener boardReceivedListener) {

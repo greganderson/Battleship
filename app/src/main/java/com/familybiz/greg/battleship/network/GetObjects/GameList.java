@@ -3,7 +3,7 @@ package com.familybiz.greg.battleship.network.GetObjects;
 import android.os.AsyncTask;
 
 import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.GameData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -47,9 +47,9 @@ public class GameList {
 
 		Gson gson = new Gson();
 
-		Type gameType = new TypeToken<Game[]>(){}.getType();
-		Game[] games = gson.fromJson(result, gameType);
-		mOnAllGamesReceivedListener.onAllGamesReceived(games);
+		Type gameType = new TypeToken<GameData[]>(){}.getType();
+		GameData[] gameDatas = gson.fromJson(result, gameType);
+		mOnAllGamesReceivedListener.onAllGamesReceived(gameDatas);
 	}
 
 
@@ -88,7 +88,7 @@ public class GameList {
 	// All Games Listener
 
 	public interface OnAllGamesReceivedListener {
-		public void onAllGamesReceived(Game[] games);
+		public void onAllGamesReceived(GameData[] gameDatas);
 	}
 	private OnAllGamesReceivedListener mOnAllGamesReceivedListener = null;
 	public void setOnAllGamesReceivedListener(OnAllGamesReceivedListener onAllGamesReceivedListener) {

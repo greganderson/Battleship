@@ -3,7 +3,7 @@ package com.familybiz.greg.battleship.network.GetObjects;
 import android.os.AsyncTask;
 
 import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.GameData;
 import com.familybiz.greg.battleship.network.requestObjects.GameDetail;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,8 +21,8 @@ import java.util.Scanner;
  */
 public class GameDetailRequest {
 
-	public void executeGet(Game[] games, int id) {
-		new GetGameDetailTask().execute(TestActivity.baseUrl + "/" + games[id].id);
+	public void executeGet(GameData[] gameDatas, int id) {
+		new GetGameDetailTask().execute(TestActivity.baseUrl + "/" + gameDatas[id].id);
 	}
 
 	private class GetGameDetailTask extends AsyncTask<String, Void, String> {

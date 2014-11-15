@@ -3,7 +3,7 @@ package com.familybiz.greg.battleship.network;
 
 import com.familybiz.greg.battleship.network.GetObjects.GameDetailRequest;
 import com.familybiz.greg.battleship.network.GetObjects.GameList;
-import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.GameData;
 
 /**
  * Created by Greg Anderson
@@ -31,8 +31,8 @@ public class GetRequest {
 
 	// Get game detail
 
-	public void getGameDetail(Game[] games, int id) {
-		mGameDetailRequest.executeGet(games, id);
+	public void getGameDetail(GameData[] gameDatas, int id) {
+		mGameDetailRequest.executeGet(gameDatas, id);
 	}
 
 	public void setOnGameDetailReceivedListener(GameDetailRequest.OnGameDetailReceivedListener onGameDetailReceivedListener) {

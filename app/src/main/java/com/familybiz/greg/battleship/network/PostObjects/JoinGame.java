@@ -3,7 +3,7 @@ package com.familybiz.greg.battleship.network.PostObjects;
 import android.os.AsyncTask;
 
 import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.Player;
+import com.familybiz.greg.battleship.network.requestObjects.PlayerData;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
@@ -58,10 +58,10 @@ public class JoinGame {
 		Gson gson = new Gson();
 
 		String playerId = gson.fromJson(result, String.class);
-		Player player = new Player();
-		player.playerId = playerId;
-		player.playerName = playerName;
-		mOnJoinGameListener.onJoinGame(player);
+		PlayerData playerData = new PlayerData();
+		playerData.playerId = playerId;
+		playerData.playerName = playerName;
+		mOnJoinGameListener.onJoinGame(playerData);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class JoinGame {
 	// Joining game
 
 	public interface OnJoinGameListener {
-		public void onJoinGame(Player player);
+		public void onJoinGame(PlayerData playerData);
 	}
 	private OnJoinGameListener mOnJoinGameListener;
 	public void setOnJoinGameListener(OnJoinGameListener onJoinGameListener) {
