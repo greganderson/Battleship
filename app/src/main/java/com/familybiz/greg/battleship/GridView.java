@@ -16,7 +16,7 @@ public class GridView extends ViewGroup {
 	public static final int CELL_COLOR_MISS = Color.WHITE;
 	public static final int CELL_COLOR_HIT = Color.RED;
 
-    private CellView[][] mCells = new CellView[Player.GRID_HEIGHT][Player.GRID_WIDTH];
+    private CellView[][] mCells = new CellView[10][10];
 
     public GridView(Context context) {
         super(context);
@@ -62,22 +62,22 @@ public class GridView extends ViewGroup {
 	    int bottomMargin, rightMargin;
 
         for (int childIndex = 0; childIndex < getChildCount(); childIndex++)
-            mCells[childIndex / Player.GRID_HEIGHT][childIndex % Player.GRID_WIDTH] = (CellView)getChildAt(childIndex);
+            mCells[childIndex / 10][childIndex % 10] = (CellView)getChildAt(childIndex);
 
         for (int childIndex = 0; childIndex < getChildCount(); childIndex++) {
             View child = getChildAt(childIndex);
             Rect childLayout = new Rect();
 
-            int actualWidth = getMeasuredWidth() / Player.GRID_WIDTH;
-            int actualHeight = getMeasuredHeight() / Player.GRID_HEIGHT;
+            int actualWidth = getMeasuredWidth() / 10;
+            int actualHeight = getMeasuredHeight() / 10;
 
-            childLayout.left = (childIndex % Player.GRID_WIDTH) * (actualWidth);
-            childLayout.top = (childIndex / Player.GRID_HEIGHT) * actualHeight;
-            childLayout.right = ((childIndex % Player.GRID_WIDTH) * actualWidth) + actualWidth;
-            childLayout.bottom = ((childIndex / Player.GRID_HEIGHT) * actualHeight) + actualHeight;
+            childLayout.left = (childIndex % 10) * (actualWidth);
+            childLayout.top = (childIndex / 10) * actualHeight;
+            childLayout.right = ((childIndex % 10) * actualWidth) + actualWidth;
+            childLayout.bottom = ((childIndex / 10) * actualHeight) + actualHeight;
 
-	        bottomMargin = childIndex / Player.GRID_HEIGHT == Player.GRID_HEIGHT - 1 ? 0 : margin;
-	        rightMargin  = childIndex % Player.GRID_WIDTH  == Player.GRID_WIDTH  - 1 ? 0 : margin;
+	        bottomMargin = childIndex / 10 == 10 - 1 ? 0 : margin;
+	        rightMargin  = childIndex % 10  == 10  - 1 ? 0 : margin;
 
 			child.layout(
 					childLayout.left + margin,

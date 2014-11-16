@@ -15,38 +15,44 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.familybiz.greg.battleship.network.GetObjects.GameList;
+import com.familybiz.greg.battleship.network.GetRequest;
 import com.familybiz.greg.battleship.network.PostObjects.CreateGame;
 import com.familybiz.greg.battleship.network.requestObjects.Game;
 import com.familybiz.greg.battleship.network.requestObjects.Player;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 /**
  * Created by Greg Anderson
  */
-public class GameListFragment extends Fragment implements ListAdapter, CreateGame.OnCreateGameListener {
+public class GameListFragment extends Fragment implements ListAdapter, GameList.OnAllGamesReceivedListener, CreateGame.OnCreateGameListener {
 
 	public final int GAME_SUCCESSFULLY_CREATED = 1;
 	public final int GAME_CREATION_CANCELLED = 2;
 
 	private Button mNewGameButton;
+	private ListView mGameListView;
+
+	private GetRequest mGetRequest;
+
+	private Game[] mGames;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mGetRequest = new GetRequest();
+		mGames = new Game[0];
+
 		LinearLayout rootLayout = new LinearLayout(getActivity());
 		rootLayout.setOrientation(LinearLayout.VERTICAL);
 
-		final ListView gameListView = new ListView(getActivity());
-		rootLayout.addView(gameListView, new LinearLayout.LayoutParams(
+		mGameListView = new ListView(getActivity());
+		rootLayout.addView(mGameListView, new LinearLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT,
 				0,
 				1));
-		gameListView.setAdapter(this);
-		gameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				if (mOnGameSelectedListener != null)
-					mOnGameSelectedListener.onGameSelected(games[i].name);
-			}
-		});
+		mGameListView.setAdapter(this);
 
 		mNewGameButton = new Button(getActivity());
 		mNewGameButton.setText(getString(R.string.new_game_button_text));
@@ -57,6 +63,21 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 		newGameButtonParams.gravity = Gravity.CENTER;
 		rootLayout.addView(mNewGameButton, newGameButtonParams);
 
+
+		// Click on list item
+
+		mGameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				// Only trigger the listener if the game is in the waiting stage.
+				if (mGames[i].status.equals("WAITING") && mOnGameSelectedListener != null)
+					mOnGameSelectedListener.onGameSelected(mGames[i].id);
+			}
+		});
+
+
+		// New game
+
 		mNewGameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -66,7 +87,47 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 		});
 
 
+		mGetRequest.setOnAllGamesReceivedListener(this);
+		mGetRequest.getAllGames();
+
 		return rootLayout;
+	}
+	@Override
+	public void onAllGamesReceived(Game[] games) {
+		mGames = games;
+		Arrays.sort(mGames, new Comparator<Game>() {
+			@Override
+			public int compare(Game game1, Game game2) {
+				// Waiting
+
+				if (game1.status.equals("WAITING")) {
+					if (!game2.status.equals("WAITING"))
+						return -1;
+					// Both are waiting
+					return game1.name.compareTo(game2.name);
+				}
+				// Game1 not waiting, but Game2 is
+				if (game2.status.equals("WAITING"))
+					return 1;
+
+				// Playing
+
+				if (game1.status.equals("PLAYING")) {
+					if (!game2.status.equals("PLAYING"))
+						return -1;
+					// Both are playing
+					return game1.name.compareTo(game2.name);
+				}
+				// Game1 not playing, but Game2 is
+				if (game2.status.equals("PLAYING"))
+					return 1;
+
+				// Both must be done
+
+				return game1.name.compareTo(game2.name);
+			}
+		});
+		mGameListView.invalidate();
 	}
 
 	@Override
@@ -83,7 +144,7 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 
 	@Override
 	public int getCount() {
-		return GameCollection.getInstance().getListOfGames().length;
+		return mGames.length;
 	}
 
 	@Override
@@ -113,9 +174,9 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup) {
-		GameCollection.GameDetail[] games = GameCollection.getInstance().getListOfGames();
+		Game game = mGames[i];
 		TextView v = new TextView(getActivity());
-		v.setText(games[i].name + ": " + (games[i].inProgress ? "in progress" : "completed"));
+		v.setText(game.name + ": " + game.status);
 		return v;
 	}
 
@@ -136,6 +197,7 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 	public void unregisterDataSetObserver(DataSetObserver dataSetObserver) { }
 
 
+
 	/****************** LISTENERS ******************/
 
 
@@ -152,7 +214,7 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 	// Game selected from list
 
 	public interface OnGameSelectedListener {
-		public void onGameSelected(String date);
+		public void onGameSelected(String gameId);
 	}
 	private OnGameSelectedListener mOnGameSelectedListener = null;
 	public void setOnGameSelectedListener(OnGameSelectedListener onGameSelectedListener) {

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.familybiz.greg.battleship.network.GetRequest;
 import com.familybiz.greg.battleship.network.PostObjects.Guess;
 import com.familybiz.greg.battleship.network.PostObjects.PlayerBoard;
 import com.familybiz.greg.battleship.network.PostObjects.PlayerStatus;
@@ -34,7 +33,6 @@ public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceive
 	private GridView mOpponentGrid;
 
 	private PostRequest mPostRequest;
-	private GetRequest mGetRequest;
 
 	private Stack<Coord> mShotStack;
 	private boolean mInProgress;
@@ -47,7 +45,6 @@ public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceive
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mPostRequest = new PostRequest();
-		mGetRequest = new GetRequest();
 		mShotStack = new Stack<Coord>();
 
 		LinearLayout rootLayout = new LinearLayout(getActivity());
