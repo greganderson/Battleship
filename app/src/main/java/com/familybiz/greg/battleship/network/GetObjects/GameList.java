@@ -2,8 +2,8 @@ package com.familybiz.greg.battleship.network.GetObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.GameData;
+import com.familybiz.greg.battleship.MainActivity;
+import com.familybiz.greg.battleship.network.requestObjects.Game;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -21,7 +21,7 @@ import java.util.Scanner;
 public class GameList {
 
 	public void executeGet() {
-		new GetAllGamesTask().execute(TestActivity.baseUrl);
+		new GetAllGamesTask().execute();
 	}
 
 	private class GetAllGamesTask extends AsyncTask<String, Void, String> {
@@ -30,7 +30,7 @@ public class GameList {
 
 			// params comes from the execute() call: params[0] is the url.
 			try {
-				return downloadUrl(urls[0]);
+				return downloadUrl();
 			} catch (IOException e) {
 				return "Unable to retrieve web page. URL may be invalid.";
 			}
@@ -47,14 +47,15 @@ public class GameList {
 
 		Gson gson = new Gson();
 
-		Type gameType = new TypeToken<GameData[]>(){}.getType();
-		GameData[] gameDatas = gson.fromJson(result, gameType);
-		mOnAllGamesReceivedListener.onAllGamesReceived(gameDatas);
+		Type gameType = new TypeToken<Game[]>(){}.getType();
+		Game[] games = gson.fromJson(result, gameType);
+		mOnAllGamesReceivedListener.onAllGamesReceived(games);
 	}
 
 
-	private String downloadUrl(String myurl) throws IOException {
+	private String downloadUrl() throws IOException {
 		InputStream is = null;
+		String myurl = MainActivity.BASE_URL;
 
 		try {
 			URL url = new URL(myurl);
@@ -65,7 +66,6 @@ public class GameList {
 			conn.setDoInput(true);
 			// Starts the query
 			conn.connect();
-			int responseCode = conn.getResponseCode();
 			is = conn.getInputStream();
 
 			// Convert the InputStream into a string
@@ -88,7 +88,7 @@ public class GameList {
 	// All Games Listener
 
 	public interface OnAllGamesReceivedListener {
-		public void onAllGamesReceived(GameData[] gameDatas);
+		public void onAllGamesReceived(Game[] games);
 	}
 	private OnAllGamesReceivedListener mOnAllGamesReceivedListener = null;
 	public void setOnAllGamesReceivedListener(OnAllGamesReceivedListener onAllGamesReceivedListener) {

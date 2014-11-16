@@ -2,7 +2,7 @@ package com.familybiz.greg.battleship.network.PostObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
+import com.familybiz.greg.battleship.MainActivity;
 import com.familybiz.greg.battleship.network.requestObjects.BoardData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -90,7 +90,7 @@ public class PlayerBoard {
 	}
 
 	private String postGetPlayerBoard(String gameId, String playerId) throws IOException {
-		String myurl = TestActivity.baseUrl + "/" + gameId + "/board";
+		String myurl = MainActivity.BASE_URL + "/" + gameId + "/board";
 
 		try {
 			JSONObject jsonObject = new JSONObject();

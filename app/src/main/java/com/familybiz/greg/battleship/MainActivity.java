@@ -10,27 +10,26 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.familybiz.greg.battleship.utils.DateParser;
-
-import java.io.File;
+import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.Player;
 
 
 /**
  * Created by Greg Anderson
  */
-public class MainActivity extends Activity implements GameListFragment.OnNewGameButtonClickedListener, GameListFragment.OnGameSelectedListener {
+public class MainActivity extends Activity implements GameListFragment.OnNewGameCreatedListener {
+
+	public static final String BASE_URL = "http://battleship.pixio.com/api/games";
+	public static final String INVALID_REQUEST = "INVALID";
 
 	GridFragment mGridFragment;
 	GameListFragment mGameListFragment;
 	FrameLayout mGameListView;
 	FrameLayout mGameView;
-	public static File SAVED_GAMES_FILEPATH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-		SAVED_GAMES_FILEPATH = getFilesDir();
 
 	    LinearLayout rootLayout = new LinearLayout(this);
 	    rootLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -47,8 +46,7 @@ public class MainActivity extends Activity implements GameListFragment.OnNewGame
 	    mGameListFragment = new GameListFragment();
 	    mGridFragment = new GridFragment();
 
-	    mGameListFragment.setOnNewGameButtonClickedListener(this);
-	    mGameListFragment.setOnGameSelectedListener(this);
+	    mGameListFragment.setOnNewGameCreatedListener(this);
 
 
 	    // Lay them out!
@@ -106,24 +104,17 @@ public class MainActivity extends Activity implements GameListFragment.OnNewGame
 	}
 
 	@Override
-	public void onNewGameButtonClicked() {
+	public void onNewGameCreated(Game game, Player player) {
 		FragmentTransaction removeTransaction = getFragmentManager().beginTransaction();
 		removeTransaction.remove(mGridFragment).commit();
 		FragmentTransaction addTransaction = getFragmentManager().beginTransaction();
+
 		mGridFragment = new GridFragment();
+		mGridFragment.setPlayer(player);
+		mGridFragment.setGame(game);
+		mGridFragment.loadCells();
+
 		addTransaction.add(11, mGridFragment).commit();
 		setScreenToGrids();
-	}
-
-	@Override
-	public void onGameSelected(String date) {
-		GameCollection.Game game = GameCollection.getInstance().getGame(DateParser.stringToDate(date));
-		setScreenToGrids();
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		GameCollection.getInstance().loadGames();
 	}
 }

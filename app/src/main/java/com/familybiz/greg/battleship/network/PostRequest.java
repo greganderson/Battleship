@@ -76,7 +76,7 @@ public class PostRequest {
 		mPlayerBoard.executePost(gameId, playerId);
 	}
 
-	public void setBoardReceivedListener(PlayerBoard.OnBoardReceivedListener boardReceivedListener) {
+	public void setOnBoardReceivedListener(PlayerBoard.OnBoardReceivedListener boardReceivedListener) {
 		mPlayerBoard.setBoardReceivedListener(boardReceivedListener);
 	}
 

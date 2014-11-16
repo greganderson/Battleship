@@ -2,7 +2,8 @@ package com.familybiz.greg.battleship.network.PostObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
+import com.familybiz.greg.battleship.MainActivity;
+import com.familybiz.greg.battleship.network.requestObjects.PlayerStatusData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -56,8 +57,8 @@ public class PlayerStatus {
 
 		Gson gson = new Gson();
 
-		Type playerStatusType = new TypeToken<PlayerStatus>(){}.getType();
-		PlayerStatus status = gson.fromJson(result, playerStatusType);
+		Type playerStatusType = new TypeToken<PlayerStatusData>(){}.getType();
+		PlayerStatusData status = gson.fromJson(result, playerStatusType);
 		mOnPlayerStatusReceivedListener.onPlayerStatusReceived(status);
 	}
 
@@ -66,7 +67,7 @@ public class PlayerStatus {
 	 * @throws java.io.IOException
 	 */
 	private String postGetPlayerStatus(String gameId, String playerId) throws IOException {
-		String myurl = TestActivity.baseUrl + "/" + gameId + "/status" + playerId;
+		String myurl = MainActivity.BASE_URL + "/" + gameId + "/status" + playerId;
 
 		try {
 			JSONObject jsonObject = new JSONObject();
@@ -98,10 +99,11 @@ public class PlayerStatus {
 	// Player status
 
 	public interface OnPlayerStatusReceivedListener {
-		public void onPlayerStatusReceived(PlayerStatus playerStatus);
+		public void onPlayerStatusReceived(PlayerStatusData playerStatusData);
 	}
 	private OnPlayerStatusReceivedListener mOnPlayerStatusReceivedListener;
 	public void setOnPlayerStatusReceivedListener(OnPlayerStatusReceivedListener onPlayerStatusReceivedListener) {
 		mOnPlayerStatusReceivedListener = onPlayerStatusReceivedListener;
 	}
+
 }

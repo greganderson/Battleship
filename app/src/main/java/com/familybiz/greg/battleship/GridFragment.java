@@ -8,21 +8,48 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.familybiz.greg.battleship.network.GetRequest;
+import com.familybiz.greg.battleship.network.PostObjects.Guess;
+import com.familybiz.greg.battleship.network.PostObjects.PlayerBoard;
+import com.familybiz.greg.battleship.network.PostObjects.PlayerStatus;
+import com.familybiz.greg.battleship.network.PostRequest;
 import com.familybiz.greg.battleship.network.requestObjects.BoardData;
+import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.Player;
+import com.familybiz.greg.battleship.network.requestObjects.PlayerStatusData;
+
+import java.util.Stack;
 
 /**
  * Created by Greg Anderson
  */
-public class GridFragment extends Fragment {
+public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceivedListener, Guess.OnGuessMadeListener, PlayerStatus.OnPlayerStatusReceivedListener {
 
+	private Game mGame;
 	private Player mPlayer;
 
 	private GridView mPlayerGrid;
 	private GridView mOpponentGrid;
 
+	private PostRequest mPostRequest;
+	private GetRequest mGetRequest;
+
+	private Stack<Coord> mShotStack;
+	private boolean mInProgress;
+
+	private class Coord {
+		int x;
+		int y;
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mPostRequest = new PostRequest();
+		mGetRequest = new GetRequest();
+		mShotStack = new Stack<Coord>();
+
 		LinearLayout rootLayout = new LinearLayout(getActivity());
 		rootLayout.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -36,23 +63,25 @@ public class GridFragment extends Fragment {
 
 		initializeCells(mPlayerGrid);
 		initializeCells(mOpponentGrid);
-
 		initializeCellTouchListener();
-
-		mPlayer = new Player();
 
 		rootLayout.addView(mPlayerGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 		rootLayout.addView(mOpponentGrid, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 
+		mPostRequest.setOnBoardReceivedListener(this);
+		mPostRequest.setGuessMadeListener(this);
+		mPostRequest.setOnPlayerStatusReceivedListener(this);
+
 		return rootLayout;
 	}
 
-	/**
-	 * Sets the title of the app to the name of the player.
-	 */
-	public void setPlayerName(String playerName) {
-		getActivity().setTitle(playerName);
+	public void setGame(Game game) {
+		mGame = game;
+	}
 
+	public void setPlayer(Player player) {
+		getActivity().setTitle(player.playerName);
+		mPlayer = player;
 	}
 
 	private void initializeCells(GridView view) {
@@ -72,16 +101,22 @@ public class GridFragment extends Fragment {
 				mOpponentGrid.getCell(x, y).setOnCellTouchedListener(new CellView.OnCellTouchedListener() {
 					@Override
 					public void onCellTouched(int x, int y) {
-						// TODO: Implement
-						// TODO: Fire missile, then check if the shot was valid
+						// Queue up a shot
+						Coord coord = new Coord();
+						coord.x = x;
+						coord.y = y;
+						mShotStack.push(coord);
+
+						// Check whether the shot is allowed to be fired
+						mPostRequest.getPlayerStatus(mGame.id, mPlayer.playerId);
 					}
 				});
 			}
 		}
 	}
 
-	public void updateCells(boolean isPlayersBoard, BoardData board) {
-		updateCells(isPlayersBoard ? mPlayerGrid : mOpponentGrid, board);
+	public void loadCells() {
+		mPostRequest.loadBoards(mGame.id, mPlayer.playerId);
 	}
 
 	/**
@@ -109,5 +144,51 @@ public class GridFragment extends Fragment {
 				view.setCellColor(x, y, color);
 			}
 		}
+	}
+
+	@Override
+	public void onBoardReceived(BoardData playerBoardData, BoardData opponentBoardData) {
+		updateCells(mPlayerGrid, playerBoardData);
+		updateCells(mOpponentGrid, opponentBoardData);
+	}
+
+	@Override
+	public void onGuessMade(boolean hit, int shipSunk) {
+		if (shipSunk == -1)
+			Toast.makeText(getActivity(), "Invalid shot", Toast.LENGTH_SHORT).show();
+		else {
+			String hitMissText = hit ? "Hit!" : "Miss!";
+
+			Toast.makeText(getActivity(), hitMissText, Toast.LENGTH_SHORT).show();
+
+			// If ship was sunk
+			if (shipSunk != 0)
+				Toast.makeText(getActivity(), "Sunk!", Toast.LENGTH_SHORT).show();
+
+			// Refresh the boards
+			loadCells();
+		}
+	}
+
+	@Override
+	public void onPlayerStatusReceived(PlayerStatusData playerStatusData) {
+		// Check if game is already done.
+		mInProgress = !playerStatusData.winner.equals("DONE");
+
+		// If it's not the players turn and there is a shot ready to fire, clear the shot
+		if (!playerStatusData.isYourTurn && !mShotStack.empty())
+			mShotStack.pop();
+
+		// If there is a shot and the game is in progress, then fire the shot
+		if (!mShotStack.empty() && mInProgress) {
+			Coord coord = mShotStack.pop();
+			mPostRequest.makeGuess(mGame.id, mPlayer.playerId, coord.x, coord.y);
+		}
+	}
+
+	private void clearListeners() {
+		mPostRequest.setOnBoardReceivedListener(null);
+		mPostRequest.setGuessMadeListener(null);
+		mPostRequest.setOnPlayerStatusReceivedListener(null);
 	}
 }

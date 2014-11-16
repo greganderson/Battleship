@@ -2,7 +2,7 @@ package com.familybiz.greg.battleship.network.PostObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
+import com.familybiz.greg.battleship.MainActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -53,6 +53,10 @@ public class Guess {
 	private void parseGuessResult(String result) {
 		if (mGuessMadeListener == null)
 			return;
+		if (result.equals(MainActivity.INVALID_REQUEST)) {
+			mGuessMadeListener.onGuessMade(false, -1);
+			return;
+		}
 
 		Gson gson = new Gson();
 
@@ -69,7 +73,7 @@ public class Guess {
 	}
 
 	private String postGuess(String gameId, String playerId, int xPos, int yPos) throws IOException {
-		String myurl = TestActivity.baseUrl + "/" + gameId + "/guess";
+		String myurl = MainActivity.BASE_URL + "/" + gameId + "/guess";
 
 		try {
 			JSONObject jsonObject = new JSONObject();
@@ -88,6 +92,10 @@ public class Guess {
 			httpPost.setEntity(stringEntity);
 
 			HttpResponse httpResponse = httpClient.execute(httpPost);
+
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if (statusCode != 200)
+				return MainActivity.INVALID_REQUEST;
 
 			String responseText = EntityUtils.toString(httpResponse.getEntity());
 

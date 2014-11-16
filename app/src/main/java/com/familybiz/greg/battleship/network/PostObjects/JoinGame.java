@@ -2,8 +2,8 @@ package com.familybiz.greg.battleship.network.PostObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.PlayerData;
+import com.familybiz.greg.battleship.MainActivity;
+import com.familybiz.greg.battleship.network.requestObjects.Player;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
@@ -58,10 +58,10 @@ public class JoinGame {
 		Gson gson = new Gson();
 
 		String playerId = gson.fromJson(result, String.class);
-		PlayerData playerData = new PlayerData();
-		playerData.playerId = playerId;
-		playerData.playerName = playerName;
-		mOnJoinGameListener.onJoinGame(playerData);
+		Player player = new Player();
+		player.playerId = playerId;
+		player.playerName = playerName;
+		mOnJoinGameListener.onJoinGame(player);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class JoinGame {
 	 * @throws java.io.IOException
 	 */
 	private String postJoinGame(String gameId, String playerName) throws IOException {
-		String myurl = TestActivity.baseUrl + "/" + gameId + "/join";
+		String myurl = MainActivity.BASE_URL + "/" + gameId + "/join";
 
 		try {
 			JSONObject jsonObject = new JSONObject();
@@ -101,7 +101,7 @@ public class JoinGame {
 	// Joining game
 
 	public interface OnJoinGameListener {
-		public void onJoinGame(PlayerData playerData);
+		public void onJoinGame(Player player);
 	}
 	private OnJoinGameListener mOnJoinGameListener;
 	public void setOnJoinGameListener(OnJoinGameListener onJoinGameListener) {

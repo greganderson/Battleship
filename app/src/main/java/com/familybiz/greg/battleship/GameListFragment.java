@@ -16,8 +16,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.familybiz.greg.battleship.network.PostObjects.CreateGame;
-import com.familybiz.greg.battleship.network.requestObjects.GameData;
-import com.familybiz.greg.battleship.network.requestObjects.PlayerData;
+import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.Player;
 
 /**
  * Created by Greg Anderson
@@ -43,16 +43,8 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 		gameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				GameCollection.GameDetail[] games = GameCollection.getInstance().getListOfGames();
 				if (mOnGameSelectedListener != null)
 					mOnGameSelectedListener.onGameSelected(games[i].name);
-			}
-		});
-
-		GameCollection.getInstance().setOnGameCollectionChangedListener(new GameCollection.OnGameCollectionChangedListener() {
-			@Override
-			public void onGameCollectionChanged() {
-				gameListView.invalidateViews();
 			}
 		});
 
@@ -69,7 +61,7 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 			@Override
 			public void onClick(View view) {
 				Intent createGameIntent = new Intent();
-				startActivityForResult(createGameIntent, 0);
+				startActivity(createGameIntent);
 			}
 		});
 
@@ -78,16 +70,10 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		if (requestCode == GAME_SUCCESSFULLY_CREATED)
-			if (mOnNewGameButtonClickedListener != null)
-				mOnNewGameButtonClickedListener.onNewGameButtonClicked();
-	}
-
-	public void setNewGameButtonStatus(boolean enabled) {
-		mNewGameButton.setClickable(enabled);
+	public void onCreateGame(Game game, Player player) {
+		// TODO: Store the data for the player to use
+		if (mOnNewGameCreatedListener != null)
+			mOnNewGameCreatedListener.onNewGameCreated(game, player);
 	}
 
 	@Override
@@ -149,23 +135,18 @@ public class GameListFragment extends Fragment implements ListAdapter, CreateGam
 	@Override
 	public void unregisterDataSetObserver(DataSetObserver dataSetObserver) { }
 
-	@Override
-	public void onCreateGame(GameData gameData, PlayerData playerData) {
-		// TODO: Store the data for the player to use
-	}
-
 
 	/****************** LISTENERS ******************/
 
 
 	// New game button listener
 
-	public interface OnNewGameButtonClickedListener {
-		public void onNewGameButtonClicked();
+	public interface OnNewGameCreatedListener {
+		public void onNewGameCreated(Game game, Player player);
 	}
-	private OnNewGameButtonClickedListener mOnNewGameButtonClickedListener = null;
-	public void setOnNewGameButtonClickedListener(OnNewGameButtonClickedListener onNewGameButtonClickedListener) {
-		mOnNewGameButtonClickedListener = onNewGameButtonClickedListener;
+	private OnNewGameCreatedListener mOnNewGameCreatedListener = null;
+	public void setOnNewGameCreatedListener(OnNewGameCreatedListener onNewGameCreatedListener) {
+		mOnNewGameCreatedListener = onNewGameCreatedListener;
 	}
 
 	// Game selected from list

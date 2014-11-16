@@ -2,8 +2,8 @@ package com.familybiz.greg.battleship.network.GetObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.GameData;
+import com.familybiz.greg.battleship.MainActivity;
+import com.familybiz.greg.battleship.network.requestObjects.Game;
 import com.familybiz.greg.battleship.network.requestObjects.GameDetail;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,8 +21,8 @@ import java.util.Scanner;
  */
 public class GameDetailRequest {
 
-	public void executeGet(GameData[] gameDatas, int id) {
-		new GetGameDetailTask().execute(TestActivity.baseUrl + "/" + gameDatas[id].id);
+	public void executeGet(Game[] games, int id) {
+		new GetGameDetailTask().execute(games[id].id);
 	}
 
 	private class GetGameDetailTask extends AsyncTask<String, Void, String> {
@@ -53,8 +53,9 @@ public class GameDetailRequest {
 		mOnGameDetailReceivedListener.onGameDetailReceived(gameDetail);
 	}
 
-	private String downloadUrl(String myurl) throws IOException {
+	private String downloadUrl(String gameId) throws IOException {
 		InputStream is = null;
+		String myurl = MainActivity.BASE_URL + "/" + gameId;
 
 		try {
 			URL url = new URL(myurl);

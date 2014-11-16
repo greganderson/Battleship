@@ -2,9 +2,9 @@ package com.familybiz.greg.battleship.network.PostObjects;
 
 import android.os.AsyncTask;
 
-import com.familybiz.greg.battleship.network.TestActivity;
-import com.familybiz.greg.battleship.network.requestObjects.GameData;
-import com.familybiz.greg.battleship.network.requestObjects.PlayerData;
+import com.familybiz.greg.battleship.MainActivity;
+import com.familybiz.greg.battleship.network.requestObjects.Game;
+import com.familybiz.greg.battleship.network.requestObjects.Player;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -67,18 +67,18 @@ public class CreateGame {
 		GameCreated newGame = gson.fromJson(result, newGameType);
 
 		// New game
-		GameData gameData = new GameData();
-		gameData.id = newGame.gameId;
-		gameData.name = gameName;
-		gameData.status = "WAITING";
+		Game game = new Game();
+		game.id = newGame.gameId;
+		game.name = gameName;
+		game.status = "WAITING";
 
 		// New player
-		PlayerData playerData = new PlayerData();
-		playerData.playerId = newGame.playerId;
-		playerData.playerName = playerName;
+		Player player = new Player();
+		player.playerId = newGame.playerId;
+		player.playerName = playerName;
 
 		// Trigger listener
-		mOnCreateGameListener.onCreateGame(gameData, playerData);
+		mOnCreateGameListener.onCreateGame(game, player);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class CreateGame {
 	 * @throws java.io.IOException
 	 */
 	private String postCreateGame(String gameName, String playerName) throws IOException {
-		String myurl = TestActivity.baseUrl;
+		String myurl = MainActivity.BASE_URL;
 
 		try {
 			JSONObject jsonObject = new JSONObject();
@@ -125,7 +125,7 @@ public class CreateGame {
 	// Joining game
 
 	public interface OnCreateGameListener {
-		public void onCreateGame(GameData gameData, PlayerData playerData);
+		public void onCreateGame(Game game, Player player);
 	}
 	private OnCreateGameListener mOnCreateGameListener;
 	public void setOnCreateGameListener(OnCreateGameListener onCreateGameListener) {
