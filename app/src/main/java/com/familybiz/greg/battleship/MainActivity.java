@@ -17,7 +17,7 @@ import com.familybiz.greg.battleship.network.requestObjects.Player;
 /**
  * Created by Greg Anderson
  */
-public class MainActivity extends Activity implements GameListFragment.OnNewGameCreatedListener {
+public class MainActivity extends Activity implements GameListFragment.OnNewGameCreatedListener, GameListFragment.OnGameSelectedListener {
 
 	public static final String BASE_URL = "http://battleship.pixio.com/api/games";
 	public static final String INVALID_REQUEST = "INVALID";
@@ -47,6 +47,7 @@ public class MainActivity extends Activity implements GameListFragment.OnNewGame
 	    mGridFragment = new GridFragment();
 
 	    mGameListFragment.setOnNewGameCreatedListener(this);
+		mGameListFragment.setOnGameSelectedListener(this);
 
 
 	    // Lay them out!
@@ -116,5 +117,10 @@ public class MainActivity extends Activity implements GameListFragment.OnNewGame
 
 		addTransaction.add(11, mGridFragment).commit();
 		setScreenToGrids();
+	}
+
+	@Override
+	public void onGameSelected(String gameId) {
+		// TODO: Implement
 	}
 }
