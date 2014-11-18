@@ -7,5 +7,6 @@
 
     <string name="close_button_text">Ready!</string>
     <string name="new_game_button_text">New Game</string>
+    <string name="create_game_button">Create Game</string>
 
 </resources>
