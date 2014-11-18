@@ -32,8 +32,9 @@ public class GameList {
 			try {
 				return downloadUrl();
 			} catch (IOException e) {
-				return "Unable to retrieve web page. URL may be invalid.";
+				e.printStackTrace();
 			}
+			return "What the freak...";
 		}
 		@Override
 		protected void onPostExecute(String result) {
@@ -51,6 +52,28 @@ public class GameList {
 		Game[] games = gson.fromJson(result, gameType);
 		mOnAllGamesReceivedListener.onAllGamesReceived(games);
 	}
+
+	/*
+	private String downloadUrl() {
+		String myurl = MainActivity.BASE_URL;
+
+		try {
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet(myurl);
+
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+
+			String responseText = EntityUtils.toString(httpResponse.getEntity());
+
+			return responseText;
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	*/
 
 
 	private String downloadUrl() throws IOException {

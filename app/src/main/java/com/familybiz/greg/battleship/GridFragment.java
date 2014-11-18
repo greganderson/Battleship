@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.familybiz.greg.battleship.network.PostObjects.Guess;
+import com.familybiz.greg.battleship.network.PostObjects.JoinGame;
 import com.familybiz.greg.battleship.network.PostObjects.PlayerBoard;
 import com.familybiz.greg.battleship.network.PostObjects.PlayerStatus;
 import com.familybiz.greg.battleship.network.PostRequest;
@@ -24,7 +25,7 @@ import java.util.Stack;
 /**
  * Created by Greg Anderson
  */
-public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceivedListener, Guess.OnGuessMadeListener, PlayerStatus.OnPlayerStatusReceivedListener {
+public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceivedListener, Guess.OnGuessMadeListener, PlayerStatus.OnPlayerStatusReceivedListener, JoinGame.OnJoinGameListener {
 
 	private Game mGame;
 	private Player mPlayer;
@@ -68,6 +69,7 @@ public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceive
 		mPostRequest.setOnBoardReceivedListener(this);
 		mPostRequest.setGuessMadeListener(this);
 		mPostRequest.setOnPlayerStatusReceivedListener(this);
+		mPostRequest.setOnJoinGameListener(this);
 
 		return rootLayout;
 	}
@@ -120,8 +122,8 @@ public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceive
 	 * Updates the cells in the given grid view to match the cell types of cells.
 	 */
 	private void updateCells(GridView view, BoardData board) {
-		for (int y = 0; y < 100; y++) {
-			for (int x = 0; x < 100; x++) {
+		for (int y = 0; y < 10; y++) {
+			for (int x = 0; x < 10; x++) {
 				int color = view.getCellColor(x, y);
 				String status = board.cells[y][x].status;
 
@@ -141,6 +143,22 @@ public class GridFragment extends Fragment implements PlayerBoard.OnBoardReceive
 				view.setCellColor(x, y, color);
 			}
 		}
+	}
+
+	public void joinGame(String gameName, String gameId, String playerName) {
+		Game g = new Game();
+		g.name = gameName;
+		g.id = gameId;
+		g.status = "WAITING";
+		setGame(g);
+		mPostRequest.joinGame(gameId, playerName);
+	}
+
+	@Override
+	public void onJoinGame(Player player) {
+		mPlayer = player;
+		mGame.status = "PLAYING";
+		mPostRequest.loadBoards(mGame.id, mPlayer.playerId);
 	}
 
 	@Override

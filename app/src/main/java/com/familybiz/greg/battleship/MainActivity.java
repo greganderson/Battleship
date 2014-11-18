@@ -120,7 +120,8 @@ public class MainActivity extends Activity implements GameListFragment.OnNewGame
 	}
 
 	@Override
-	public void onGameSelected(String gameId) {
-		// TODO: Implement
+	public void onGameSelected(String gameName, String gameId, String playerName) {
+		mGridFragment.joinGame(gameName, gameId, playerName);
+		setScreenToGrids();
 	}
 }

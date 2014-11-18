@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import com.familybiz.greg.battleship.MainActivity;
 import com.familybiz.greg.battleship.network.requestObjects.Player;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -15,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 
 /**
@@ -57,9 +59,8 @@ public class JoinGame {
 
 		Gson gson = new Gson();
 
-		String playerId = gson.fromJson(result, String.class);
-		Player player = new Player();
-		player.playerId = playerId;
+		Type playerType = new TypeToken<Player>(){}.getType();
+		Player player = gson.fromJson(result, playerType);
 		player.playerName = playerName;
 		mOnJoinGameListener.onJoinGame(player);
 	}

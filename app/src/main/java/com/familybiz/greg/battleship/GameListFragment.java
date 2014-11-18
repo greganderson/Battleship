@@ -1,10 +1,11 @@
 package com.familybiz.greg.battleship;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 	private GetRequest mGetRequest;
 
 	private Game[] mGames;
+	private String mPlayerName;
+	private String mGameName;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,14 +57,33 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 				1));
 		mGameListView.setAdapter(this);
 
+		// New game row
+		LinearLayout newGameLayout = new LinearLayout(getActivity());
+		newGameLayout.setOrientation(LinearLayout.HORIZONTAL);
+		rootLayout.addView(newGameLayout, new LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT));
+
 		mNewGameButton = new Button(getActivity());
 		mNewGameButton.setText(getString(R.string.new_game_button_text));
-		LinearLayout.LayoutParams newGameButtonParams = new LinearLayout.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				0);
-		newGameButtonParams.gravity = Gravity.CENTER;
-		rootLayout.addView(mNewGameButton, newGameButtonParams);
+		newGameLayout.addView(mNewGameButton, new LinearLayout.LayoutParams(
+				0,
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				1));
+
+		TextView playerNameEntryView = new TextView(getActivity());
+		playerNameEntryView.setEnabled(true);
+		newGameLayout.addView(playerNameEntryView, new LinearLayout.LayoutParams(
+				0,
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				1));
+
+		TextView gameNameEntryView = new TextView(getActivity());
+		gameNameEntryView.setEnabled(true);
+		newGameLayout.addView(gameNameEntryView, new LinearLayout.LayoutParams(
+				0,
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				1));
 
 
 		// Click on list item
@@ -69,9 +91,10 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 		mGameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				mPlayerName = "Lord of Chaos";
 				// Only trigger the listener if the game is in the waiting stage.
 				if (mGames[i].status.equals("WAITING") && mOnGameSelectedListener != null)
-					mOnGameSelectedListener.onGameSelected(mGames[i].id);
+					mOnGameSelectedListener.onGameSelected(mGames[i].name, mGames[i].id, mPlayerName);
 			}
 		});
 
@@ -81,11 +104,44 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 		mNewGameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent createGameIntent = new Intent();
-				startActivity(createGameIntent);
+				// TODO: Implement
 			}
 		});
 
+		playerNameEntryView.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+				mPlayerName = charSequence.toString();
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+
+			}
+		});
+
+		gameNameEntryView.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+				mGameName = charSequence.toString();
+				Log.i("Game Name", mGameName);
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+
+			}
+		});
 
 		mGetRequest.setOnAllGamesReceivedListener(this);
 		mGetRequest.getAllGames();
@@ -95,6 +151,7 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 	@Override
 	public void onAllGamesReceived(Game[] games) {
 		mGames = games;
+
 		Arrays.sort(mGames, new Comparator<Game>() {
 			@Override
 			public int compare(Game game1, Game game2) {
@@ -116,7 +173,10 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 					if (!game2.status.equals("PLAYING"))
 						return -1;
 					// Both are playing
-					return game1.name.compareTo(game2.name);
+					if (game1.name == null || game2.name == null)
+						return 1;
+					int comp = game1.name.compareTo(game2.name);
+					return comp;
 				}
 				// Game1 not playing, but Game2 is
 				if (game2.status.equals("PLAYING"))
@@ -214,7 +274,7 @@ public class GameListFragment extends Fragment implements ListAdapter, GameList.
 	// Game selected from list
 
 	public interface OnGameSelectedListener {
-		public void onGameSelected(String gameId);
+		public void onGameSelected(String gameName, String gameId, String playerName);
 	}
 	private OnGameSelectedListener mOnGameSelectedListener = null;
 	public void setOnGameSelectedListener(OnGameSelectedListener onGameSelectedListener) {

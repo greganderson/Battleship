@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 
 /**
  * Created by Greg Anderson
@@ -53,40 +54,35 @@ public class PlayerBoard {
 
 		Gson gson = new Gson();
 
-		Type boardType = new TypeToken<ResultBoard[]>(){}.getType();
-		ResultBoard[] boardResult = gson.fromJson(result, boardType);
+		Type boardType = new TypeToken<HashMap<String, ResultCell[]>>(){}.getType();
+		HashMap<String, ResultCell[]> boardResult = gson.fromJson(result, boardType);
 
 		BoardData playerBoardData = new BoardData();
 		BoardData opponentBoardData = new BoardData();
 		playerBoardData.cells = new BoardData.CellData[10][10];
 		opponentBoardData.cells = new BoardData.CellData[10][10];
 
-		for (int boardIndex = 0; boardIndex < 2; boardIndex++) {
-			ResultBoard.ResultCell[] resultCells = boardResult[boardIndex].resultCells;
-			for (int i = 0; i < 10; i++) {
-				for (int j = 0; j < 10; j++) {
-					int x = j;
-					int y = i * 10;
-					ResultBoard.ResultCell cell = resultCells[i * 10 + j];
-					playerBoardData.addCell(y, x);
-					playerBoardData.cells[y][x].xPos = cell.xPos;
-					playerBoardData.cells[y][x].yPos = cell.yPos;
-					playerBoardData.cells[y][x].status = cell.status;
-				}
-			}
+		ResultCell[] playerCells = boardResult.get("playerBoard");
+		ResultCell[] opponentCells = boardResult.get("opponentBoard");
+
+		for (int i = 0; i < 100; i++) {
+			ResultCell pCell = playerCells[i];
+			playerBoardData.addCell(i % 10, i / 10);
+			playerBoardData.cells[pCell.yPos][pCell.xPos].status = pCell.status;
+
+			ResultCell oCell = opponentCells[i];
+			opponentBoardData.addCell(i % 10, i / 10);
+			opponentBoardData.cells[oCell.yPos][oCell.xPos].status = oCell.status;
 		}
 
 		// Trigger listener
 		mBoardReceivedListener.onBoardReceived(playerBoardData, opponentBoardData);
 	}
 
-	private class ResultBoard {
-		ResultCell[] resultCells;
-		public class ResultCell {
-			public int xPos;
-			public int yPos;
-			public String status;
-		}
+	private class ResultCell {
+		public int xPos;
+		public int yPos;
+		public String status;
 	}
 
 	private String postGetPlayerBoard(String gameId, String playerId) throws IOException {

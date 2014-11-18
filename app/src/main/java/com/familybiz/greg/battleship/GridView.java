@@ -3,6 +3,7 @@ package com.familybiz.greg.battleship;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -35,7 +36,7 @@ public class GridView extends ViewGroup {
 	}
 
 	public int getCellColor(int x, int y) {
-		return mCells[y][x].getSolidColor();
+		return ((ColorDrawable)mCells[y][x].getBackground()).getColor();
 	}
 
     @Override
